@@ -5,79 +5,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
     <title>Document</title>
-    <style>
-        .dg-next-step-button,
-        .dg-prev-step-button {
-            user-select: none;
-        }
-
-        .option {
-            user-select: none;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            border: 1px solid #cccccc;
-            padding: 15px;
-            width: 100%;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.3s all;
-        }
-
-        .option:hover {
-            background-color: #efefef;
-        }
-
-        .bullet {
-            transition: 0.3s all;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 20px;
-            height: 20px;
-            border: 1px solid #cccccc;
-            border-radius: 100%;
-            margin-left: 10px;
-            background-color: #ffffff;
-            padding: 2px;
-        }
-
-        .selected {
-            transition: 0.3s all;
-            background-color: rgb(209, 234, 255) !important;
-            border: 1px solid rgb(90, 150, 255);
-        }
-
-        .selected .bullet {
-            background-color: rgb(90, 150, 255);
-            color: white !important;
-        }
-
-        .bullet .check {
-            display: none;
-        }
-
-        .selected .bullet .check {
-            display: block;
-        }
-
-        .dg-entrance-card {
-            z-index: 99999;
-        }
-
-        @media screen and (min-width: 1024px) {
-            #plotId {
-                width: 480px;
-            }
-        }
-
-        .dg-after-exam-question{
-            transform: matrix(1, 0, 0 , 1 , 0 , 0) !important;
-        }
-    </style>
     <link rel="stylesheet" href="persian-datepicker.min.css" />
+    <link rel="stylesheet" href="index.css" />
 
 </head>
 
@@ -692,114 +622,15 @@
                 </button>
             </div>
         </div>
-
-
-
     </div>
 
 
-    <script src="index.js"></script>
     <script src="jquery-3.6.4.min.js"></script>
     <script src="persian-date.min.js"></script>
     <script src="persian-datepicker.min.js"></script>
+    <script src="index.js"></script>
 
-    <script type="text/javascript">
-        $('.date-picker').persianDatepicker({
-            "inline": false,
-            "format": "LLLL",
-            "viewMode": "day",
-            "initialValue": 1682970244916,
-            "minDate": Date(),
-            "maxDate": null,
-            "autoClose": false,
-            "position": "auto",
-            "altFormat": "lll",
-            "altField": "#تست",
-            "onlyTimePicker": false,
-            "onlySelectOnDate": true,
-            "calendarType": "persian",
-            "inputDelay": 800,
-            "observer": false,
-            "calendar": {
-                "persian": {
-                    "locale": "fa",
-                    "showHint": false,
-                    "leapYearMode": "algorithmic"
-                },
-                "gregorian": {
-                    "locale": "en",
-                    "showHint": true
-                }
-            },
-            "navigator": {
-                "enabled": true,
-                "scroll": {
-                    "enabled": true
-                },
-                "text": {
-                    "btnNextText": "<",
-                    "btnPrevText": ">"
-                }
-            },
-            "toolbox": {
-                "enabled": true,
-                "calendarSwitch": {
-                    "enabled": false,
-                    "format": "MMMM"
-                },
-                "todayButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "امروز",
-                        "en": "Today"
-                    }
-                },
-                "submitButton": {
-                    "enabled": true,
-                    "text": {
-                        "fa": "تایید",
-                        "en": "Submit"
-                    }
-                },
-                "text": {
-                    "btnToday": "امروز"
-                }
-            },
-            "timePicker": {
-                "enabled": true,
-                "step": 1,
-                "hour": {
-                    "enabled": true,
-                    "step": null
-                },
-                "minute": {
-                    "enabled": true,
-                    "step": "15"
-                },
-                "second": {
-                    "enabled": false,
-                    "step": null
-                },
-                "meridian": {
-                    "enabled": false
-                }
-            },
-            "dayPicker": {
-                "enabled": true,
-                "titleFormat": "YYYY MMMM"
-            },
-            "monthPicker": {
-                "enabled": false,
-                "titleFormat": "YYYY"
-            },
-            "yearPicker": {
-                "enabled": false,
-                "titleFormat": "YYYY"
-            },
-            "responsive": true
 
-        });
-    </script>
 
 </body>
 

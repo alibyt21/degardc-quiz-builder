@@ -154,7 +154,7 @@ function set_start_exam_button_position() {
         .getPropertyValue("padding-left")
         .replace("px", "");
     startExamButton.style.transform =
-        "translateX(" +(s / 2 - extraPadding) + "px)";
+        "translateX(" + (s / 2 - extraPadding) + "px)";
 }
 
 function set_z_index_for_all_steps_and_make_them_3d() {
