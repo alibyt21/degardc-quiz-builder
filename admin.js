@@ -231,7 +231,7 @@ function delete_answer_by_question_and_answer_index(
 }
 
 let quizContainer = document.getElementById("quiz-container");
-quizContainer.addEventListener("keyup", function (e) {
+quizContainer.addEventListener("change", function (e) {
     if (e.target.className.includes("quiz")) {
         // related to quiz
         if (e.target.className.includes("quiz-name")) {
@@ -364,6 +364,7 @@ quizContainer.addEventListener("click", function (e) {
                 relatedQuestion.parentElement.children
             ).indexOf(relatedQuestion);
             add_new_answer_by_question_index(state, questionIndex);
+            console.log(state);
         }
         sync_state_to_view(state);
     }
@@ -371,7 +372,7 @@ quizContainer.addEventListener("click", function (e) {
 /* END sync view to state */
 
 setInterval(function () {
-    console.log(state);
+    // console.log(state);
 }, 2000);
 
 sync_state_to_view(state);
