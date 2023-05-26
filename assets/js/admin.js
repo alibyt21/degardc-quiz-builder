@@ -131,8 +131,14 @@ function sync_answers_of_a_single_question(answers, questionDOM) {
 /* START sync view to state */
 function change_quiz_state(state, newQuizState) {
     let prevState = state;
-    state.name = newQuizState.name || prevState.name;
-    state.description = newQuizState.description || prevState.description;
+    state.name =
+        newQuizState.name || newQuizState.name == ""
+            ? newQuizState.name
+            : prevState.name;
+    state.description =
+        newQuizState.description || newQuizState.description == ""
+            ? newQuizState.description
+            : prevState.description;
     state.settings = newQuizState.settings || prevState.settings;
 }
 
@@ -143,8 +149,14 @@ function change_question_state_by_question_index(
 ) {
     let prevState = state.questions[questionIndex];
     state.questions[questionIndex] = {
-        name: newQuestionState.name || prevState.name,
-        description: newQuestionState.description || prevState.description,
+        name:
+            newQuestionState.name || newQuestionState.name == ""
+                ? newQuestionState.name
+                : prevState.name,
+        description:
+            newQuestionState.description || newQuestionState.description == ""
+                ? newQuestionState.description
+                : prevState.description,
         answers: prevState.answers,
     };
 }
@@ -157,8 +169,14 @@ function change_answer_state_by_question_and_answer_index(
 ) {
     let prevState = state.questions[questionIndex].answers[answerIndex];
     state.questions[questionIndex].answers[answerIndex] = {
-        name: newAnswerState.name || prevState.name,
-        priority: newAnswerState.priority || prevState.priority,
+        name:
+            newAnswerState.name || newAnswerState.name == ""
+                ? newAnswerState.name
+                : prevState.name,
+        priority:
+            newAnswerState.priority || newAnswerState.priority == ""
+                ? newAnswerState.priority
+                : prevState.priority,
         isCorrect:
             newAnswerState.isCorrect !== undefined &&
             newAnswerState.isCorrect !== null
@@ -268,6 +286,7 @@ quizContainer.addEventListener("change", function (e) {
             );
         }
     }
+    save_data_to_db(state);
 });
 quizContainer.addEventListener("click", function (e) {
     if (find_related_parent_by_className(e.target, "delete")) {
@@ -324,10 +343,10 @@ quizContainer.addEventListener("click", function (e) {
                 relatedQuestion.parentElement.children
             ).indexOf(relatedQuestion);
             add_new_answer_by_question_index(state, questionIndex);
-            console.log(state);
         }
         sync_state_to_view(state);
     }
+    save_data_to_db(state);
 });
 /* END sync view to state */
 
@@ -336,3 +355,72 @@ setInterval(function () {
 }, 2000);
 
 sync_state_to_view(state);
+
+let urlParams = new URLSearchParams(window.location.search);
+let id = urlParams.get("id") ? urlParams.get("id") : null;
+let firstTry = true;
+
+function get_init_state() {
+    if (!id) {
+        return;
+    }
+    fetch(
+        degardc_quiz_builder_ajax_object.ajax_url +
+            "?" +
+            new URLSearchParams({
+                action: "degardc_quiz_builder_get_quiz_data_ajax",
+                id,
+            }),
+        {
+            method: "POST",
+            credentials: "same-origin",
+        }
+    )
+        .then((response) => response.json())
+        .then((data) => {
+            state = JSON.parse(data.message);
+            sync_state_to_view(state);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+}
+get_init_state();
+
+function save_data_to_db(state) {
+    // we send id in update and null in insert
+    if (id) {
+        // update
+        send_state_to_back_end((mode = "update"));
+    } else {
+        // insert
+        if (firstTry) {
+            firstTry = false;
+            send_state_to_back_end((mode = "insert"));
+        }
+    }
+}
+
+function send_state_to_back_end(mode = "update") {
+    let apiURL =
+        degardc_quiz_builder_ajax_object.ajax_url +
+        "?" +
+        new URLSearchParams({
+            action: "degardc_quiz_builder_save_quiz_data_ajax",
+            id,
+        });
+    fetch(apiURL, {
+        method: "POST",
+        credentials: "same-origin",
+        body: JSON.stringify(state),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (mode == "insert") {
+                id = data.message;
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+}

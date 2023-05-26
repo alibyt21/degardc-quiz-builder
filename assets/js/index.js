@@ -1,103 +1,270 @@
-$(".date-picker").persianDatepicker({
-    inline: false,
-    format: "LLLL",
-    viewMode: "day",
-    initialValue: 1682970244916,
-    minDate: Date(),
-    maxDate: null,
-    autoClose: false,
-    position: "auto",
-    altFormat: "lll",
-    altField: "#تست",
-    onlyTimePicker: false,
-    onlySelectOnDate: true,
-    calendarType: "persian",
-    inputDelay: 800,
-    observer: false,
-    calendar: {
-        persian: {
-            locale: "fa",
-            showHint: false,
-            leapYearMode: "algorithmic",
-        },
-        gregorian: {
-            locale: "en",
-            showHint: true,
-        },
-    },
-    navigator: {
-        enabled: true,
-        scroll: {
-            enabled: true,
-        },
-        text: {
-            btnNextText: "<",
-            btnPrevText: ">",
-        },
-    },
-    toolbox: {
-        enabled: true,
-        calendarSwitch: {
-            enabled: false,
-            format: "MMMM",
-        },
-        todayButton: {
-            enabled: true,
-            text: {
-                fa: "امروز",
-                en: "Today",
+let quizData = {
+    group: 1,
+    name: "اولین آزمون زبان انگلیسی",
+    description: "یسری توضیحات",
+    questions: [
+        {
+            id: 1,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "جواب یک",
+                },
+                {
+                    name: "جواب دو",
+                },
+                {
+                    name: "جواب سه",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
             },
         },
-        submitButton: {
-            enabled: true,
-            text: {
-                fa: "تایید",
-                en: "Submit",
+        {
+            id: 5,
+            name: "سوال دوم",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
             },
         },
-        text: {
-            btnToday: "امروز",
+        {
+            id: 6,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
+            },
         },
-    },
-    timePicker: {
-        enabled: true,
-        step: 1,
-        hour: {
-            enabled: true,
-            step: null,
+        {
+            id: 10,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
+            },
         },
-        minute: {
-            enabled: true,
-            step: "15",
+        {
+            id: 15,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
+            },
         },
-        second: {
-            enabled: false,
-            step: null,
+        {
+            id: 23,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
+            },
         },
-        meridian: {
-            enabled: false,
+        {
+            id: 24,
+            name: "سلام این سوال اوله",
+            description: "",
+            answers: [
+                {
+                    name: "",
+                },
+                {
+                    name: "",
+                },
+            ],
+            settings: {
+                type: "",
+                weight: "",
+            },
         },
+    ],
+    settings: {
+        requireScore: "0",
+        validateMobileNumber: true,
+        registerOnSite: true,
+        seprateResult: true,
+        bookAnAppointment: true,
     },
-    dayPicker: {
-        enabled: true,
-        titleFormat: "YYYY MMMM",
-    },
-    monthPicker: {
-        enabled: false,
-        titleFormat: "YYYY",
-    },
-    yearPicker: {
-        enabled: false,
-        titleFormat: "YYYY",
-    },
-    responsive: true,
-});
+    childs: [
+        {
+            group: 15,
+            name: "",
+            description: "",
+            questions: [
+                {
+                    id: 24,
+                    name: "سوال سوم",
+                    description: "",
+                    answers: [
+                        {
+                            name: "",
+                        },
+                        {
+                            name: "",
+                        },
+                    ],
+                    settings: {
+                        type: "",
+                        weight: "",
+                    },
+                },
+            ],
+            settings: {
+                requireScore: "0",
+                validateMobileNumber: true,
+                registerOnSite: true,
+                seprateResult: true,
+                bookAnAppointment: true,
+            },
+            childs: null,
+        },
+    ],
+};
+
+
+// make a copy of parts of html source
+let clonedMultipleChoiceAnswer = document
+    .querySelector(".sample-multiple-choice-answer")
+    .cloneNode(true);
+document.querySelector(".sample-multiple-choice-answer").remove();
+
+let clonedMultipleChoiceQuestion = document
+    .querySelector(".sample-multiple-choice-question")
+    .cloneNode(true);
+document.querySelector(".sample-multiple-choice-question").remove();
+
+let clonedMobileNumberValidation = document
+    .querySelector(".mobile-number-validation")
+    .cloneNode(true);
+document.querySelector(".mobile-number-validation").remove();
+
+let clonedRegisterOnSite = document
+    .querySelector(".register-on-site")
+    .cloneNode(true);
+document.querySelector(".register-on-site").remove();
+
+let clonedBookAnAppointment = document
+    .querySelector(".book-an-appointment")
+    .cloneNode(true);
+//remove orginals from html
+document.querySelector(".book-an-appointment").remove();
+
+let clonedResult = document.querySelector(".result").cloneNode(true);
+document.querySelector(".result").remove();
+
+function create_multiple_choice_answer(singleAnswer) {
+    let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
+    newAnswer.querySelector(".answer-name").innerHTML = singleAnswer.name;
+    return newAnswer;
+}
+function create_multiple_choice_question(singleQuestion, quizGroup) {
+    let newQuestion = clonedMultipleChoiceQuestion.cloneNode(true);
+    // answerBlock where answers add to it
+    let answerBlock = newQuestion.querySelector(".answer-block");
+    // sync question name with data
+    newQuestion.querySelector(".question-name").innerHTML = singleQuestion.name;
+    // insert id into question
+    answerBlock.dataset.qid = singleQuestion.id;
+    // insert quiz group id into question
+    answerBlock.dataset.qgroup = quizGroup;
+    singleQuestion.answers.forEach(function (singleAnswer) {
+        answerBlock.appendChild(create_multiple_choice_answer(singleAnswer));
+    });
+    return newQuestion;
+}
+function create_quiz(quizData) {
+    let mainParent = document.querySelector(".dg-main-container");
+    //name and description
+    document.querySelector(".quiz-name").innerHTML = quizData.name;
+    document.querySelector(".quiz-description").innerHTML =
+        quizData.description;
+
+    //questions
+    append_all_questions_into_html(quizData, mainParent);
+
+    //register on site
+    if (quizData.settings.registerOnSite) {
+        mainParent.appendChild(clonedRegisterOnSite);
+    }
+    if (quizData.settings.validateMobileNumber) {
+        mainParent.appendChild(clonedMobileNumberValidation);
+    }
+    if (quizData.settings.bookAnAppointment) {
+        mainParent.appendChild(clonedBookAnAppointment);
+    }
+    mainParent.appendChild(clonedResult);
+}
+function append_all_questions_into_html(quizData, parentNode) {
+    if (quizData.questions) {
+        quizData.questions.forEach(function (singleQuestion) {
+            // TODO check question type -> singleQuestion.settings.type
+            // multiple choice
+            parentNode.appendChild(
+                create_multiple_choice_question(singleQuestion, quizData.group)
+            );
+        });
+    }
+    if (quizData.childs) {
+        quizData.childs.forEach(function (singleChild) {
+            append_all_questions_into_html(singleChild, parentNode);
+        });
+    }
+}
+create_quiz(quizData);
+
 
 const QUESTION_TYPES = {
     type1: "single-option",
     type2: "multi-option",
 };
-
 let stepBlocks = document.querySelectorAll(".dg-step-block");
 let clonedStartStepBlock = stepBlocks[0].cloneNode(true);
 let clonedFirstQuestionBlock = stepBlocks[1].cloneNode(true);
@@ -117,6 +284,101 @@ function init_before_exam_start() {
     set_z_index_for_all_steps_and_make_them_3d();
     set_transition_duration_before_exam_start();
     set_questions_opacity_to_zero_and_qnumber();
+
+    $(".date-picker").persianDatepicker({
+        inline: false,
+        format: "LLLL",
+        viewMode: "day",
+        initialValue: 1682970244916,
+        minDate: Date(),
+        maxDate: null,
+        autoClose: false,
+        position: "auto",
+        altFormat: "lll",
+        altField: "#تست",
+        onlyTimePicker: false,
+        onlySelectOnDate: true,
+        calendarType: "persian",
+        inputDelay: 800,
+        observer: false,
+        calendar: {
+            persian: {
+                locale: "fa",
+                showHint: false,
+                leapYearMode: "algorithmic",
+            },
+            gregorian: {
+                locale: "en",
+                showHint: true,
+            },
+        },
+        navigator: {
+            enabled: true,
+            scroll: {
+                enabled: true,
+            },
+            text: {
+                btnNextText: "<",
+                btnPrevText: ">",
+            },
+        },
+        toolbox: {
+            enabled: true,
+            calendarSwitch: {
+                enabled: false,
+                format: "MMMM",
+            },
+            todayButton: {
+                enabled: true,
+                text: {
+                    fa: "امروز",
+                    en: "Today",
+                },
+            },
+            submitButton: {
+                enabled: true,
+                text: {
+                    fa: "تایید",
+                    en: "Submit",
+                },
+            },
+            text: {
+                btnToday: "امروز",
+            },
+        },
+        timePicker: {
+            enabled: true,
+            step: 1,
+            hour: {
+                enabled: true,
+                step: null,
+            },
+            minute: {
+                enabled: true,
+                step: "15",
+            },
+            second: {
+                enabled: false,
+                step: null,
+            },
+            meridian: {
+                enabled: false,
+            },
+        },
+        dayPicker: {
+            enabled: true,
+            titleFormat: "YYYY MMMM",
+        },
+        monthPicker: {
+            enabled: false,
+            titleFormat: "YYYY",
+        },
+        yearPicker: {
+            enabled: false,
+            titleFormat: "YYYY",
+        },
+        responsive: true,
+    });
 }
 window.addEventListener("resize", set_start_exam_button_position);
 
@@ -128,18 +390,11 @@ function set_questions_opacity_to_zero_and_qnumber() {
 }
 
 function set_transition_duration_before_exam_start() {
-    stepCards[0].style.transitionDuration =
-        entranceAnimationDuration / 1000 + "s";
-    stepCards[1].style.transitionDuration =
-        entranceAnimationDuration / 1000 + "s";
-    stepCards[2].style.transitionDuration =
-        entranceAnimationDuration / 1000 + "s";
-    stepCards[3].style.transitionDuration =
-        entranceAnimationDuration / 1000 + "s";
-    stepCards[0].style.transitionDelay = (animationDuration * 2) / 1000 + "s";
-    stepCards[1].style.transitionDelay = (animationDuration * 2) / 1000 + "s";
-    stepCards[2].style.transitionDelay = (animationDuration * 2) / 1000 + "s";
-    stepCards[3].style.transitionDelay = (animationDuration * 2) / 1000 + "s";
+    stepCards.forEach(function (single) {
+        single.style.transitionDuration =
+            entranceAnimationDuration / 1000 + "s";
+        single.style.transitionDelay = (animationDuration * 2) / 1000 + "s";
+    });
     progressBar.style.transitionDuration =
         entranceAnimationDuration / 1000 + "s";
     progressBar.style.transitionDelay = animationDuration / 1000 + "s";
@@ -217,24 +472,17 @@ function start_exam_button_animations() {
 
 function exam_is_ready_to_start() {
     let progressBar = document.querySelector(".dg-progress-bar");
-    let answersData = [];
+    let participantData = [];
     let currentIndex = 1;
 
-    let nextQuestionButton = document.querySelectorAll(
-        ".dg-next-question-button"
-    );
-    let prevQuestionButton = document.querySelectorAll(
-        ".dg-prev-question-button"
-    );
     let nextStepButton = document.querySelectorAll(".dg-next-step-button");
     let prevStepButton = document.querySelectorAll(".dg-prev-step-button");
     let allOptions = document.querySelectorAll(".option");
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
-    let afterExamCards = document.querySelectorAll(".dg-after-exam-card");
 
     init_view();
-    init_answers_data();
+    init_participant_data();
 
     allOptions.forEach(function (singleAnswer) {
         singleAnswer.addEventListener("click", handle_click_on_answer);
@@ -358,58 +606,105 @@ function exam_is_ready_to_start() {
     }
 
     function handle_click_on_answer(e) {
-        let qType =
-            e.target.parentNode.dataset.qtype ||
-            e.target.parentNode.parentNode.dataset.qtype;
-        let qNumber =
-            e.target.parentNode.parentNode.parentNode.dataset.qnumber ||
-            e.target.parentNode.parentNode.parentNode.parentNode.dataset
-                .qnumber;
-        let optionBlock = e.target.parentNode.dataset.qtype
-            ? e.target.parentNode
-            : e.target.parentNode.parentNode.dataset.qtype
-            ? e.target.parentNode.parentNode
-            : null;
-        let chosenAnswer = e.target.parentNode.dataset.qtype
-            ? e.target
-            : e.target.parentNode.parentNode.dataset.qtype
-            ? e.target.parentNode
-            : null;
-        let chosenIndex;
-        for (let index = 0; index < optionBlock.children.length; index++) {
-            if (optionBlock.children[index] == chosenAnswer) {
-                chosenIndex = index;
-            }
-        }
+        let relatedAnswerBlock = find_related_parent_by_className(
+            e.target,
+            "answer-block"
+        );
+        let qType = relatedAnswerBlock.dataset.qtype;
+        let qid = relatedAnswerBlock.dataset.qid;
+        let qgroup = relatedAnswerBlock.dataset.qgroup;
 
-        if (qType == QUESTION_TYPES.type1) {
-            for (let index = 0; index < optionBlock.children.length; index++) {
-                if (index == chosenIndex) {
-                    answersData[qNumber].option[index].isChosen =
-                        !answersData[qNumber].option[index].isChosen;
+        // for multiple choice
+        let relatedAnswer = find_related_parent_by_className(
+            e.target,
+            "option"
+        );
+
+        let answerName = relatedAnswer.querySelector(".answer-name").innerHTML;
+
+        // multiple choice questions
+        let indexInParticipantData = check_if_data_exists_in_array(
+            participantData,
+            "quizGroup",
+            qgroup,
+            "questionId",
+            qid
+        );
+        if (indexInParticipantData != -1) {
+            // update
+            let indexInAnswers = check_if_data_exists_in_array(
+                participantData[indexInParticipantData].answers,
+                "name",
+                answerName
+            );
+            if (qType == QUESTION_TYPES.type1) {
+                // single option
+                if (indexInAnswers != -1) {
+                    // data was existed before and clean up answers
+                    participantData[indexInParticipantData].answers = [];
                 } else {
-                    answersData[qNumber].option[index].isChosen = false;
+                    // add new data
+                    participantData[indexInParticipantData].answers = [
+                        {
+                            name: answerName,
+                        },
+                    ];
+                }
+            } else if (qType == QUESTION_TYPES.type2) {
+                // multi option
+                if (indexInAnswers != -1) {
+                    // data was existed before and remove it
+                    participantData[indexInParticipantData].answers.splice(
+                        indexInAnswers,
+                        1
+                    );
+                } else {
+                    participantData[indexInParticipantData].answers.push({
+                        name: answerName,
+                    });
                 }
             }
-        } else if (qType == QUESTION_TYPES.type2) {
-            answersData[qNumber].option[chosenIndex].isChosen =
-                !answersData[qNumber].option[chosenIndex].isChosen;
+        } else {
+            //insert
+            let singleAnswerData = {
+                quizGroup: qgroup,
+                questionId: qid,
+                answers: [
+                    {
+                        name: answerName,
+                    },
+                ],
+            };
+            participantData.push(singleAnswerData);
         }
+        sync_participant_data_to_view();
+    }
 
-        for (let index = 0; index < optionBlock.children.length; index++) {
-            if (answersData[qNumber].option[index].isChosen) {
-                answersData[qNumber].isAnswered = true;
+    function check_if_data_exists_in_array(
+        array,
+        key,
+        value,
+        key2 = -1,
+        value2 = -1
+    ) {
+        let isFind = -1;
+        array.forEach(function (single, index) {
+            if (key2 != -1) {
+                // we have 2pair
+                if (single[key] == value && single[key2] == value2) {
+                    isFind = index;
+                }
+            } else {
+                // we have 1pair
+                if (single[key] == value) {
+                    isFind = index;
+                }
             }
-        }
-
-        sync_data_to_view();
+        });
+        return isFind;
     }
 
     function init_view() {
-        // init first and last buttons of questions
-        nextQuestionButton[nextQuestionButton.length - 1].innerHTML =
-            "مشاهده نتیجه";
-
         // init step cards after exam (doesn't contain question of exam)
         for (let index = 0; index < stepCards.length; index++) {
             if (!stepCards[index].classList.contains("dg-question-card")) {
@@ -445,49 +740,80 @@ function exam_is_ready_to_start() {
         }
     }
 
-    function sync_data_to_view() {
-        let optionBlocks = document.querySelectorAll(".option-block");
-        optionBlocks.forEach(function (singleOptionBlock, outerIndex) {
-            for (
-                let index = 0;
-                index < singleOptionBlock.children.length;
-                index++
-            ) {
-                if (answersData[outerIndex].option[index].isChosen) {
-                    singleOptionBlock.children[index].classList.add("selected");
-                } else {
-                    singleOptionBlock.children[index].classList.remove(
-                        "selected"
+    function sync_participant_data_to_view() {
+        let answerBlocks = document.querySelectorAll(".answer-block");
+        answerBlocks.forEach(function (singleAnswerBlock) {
+            let qid = singleAnswerBlock.dataset.qid;
+            let qgroup = singleAnswerBlock.dataset.qgroup;
+            let indexInParticipantData = check_if_data_exists_in_array(
+                participantData,
+                "quizGroup",
+                qgroup,
+                "questionId",
+                qid
+            );
+            if (indexInParticipantData != -1) {
+                // means question exists in participate data
+                // START multiple choice questions
+                let options = singleAnswerBlock.querySelectorAll(".option");
+                options.forEach(function (singleAnswer) {
+                    let optionName =
+                        singleAnswer.querySelector(".answer-name").innerHTML;
+                    let indexInAnswers = check_if_data_exists_in_array(
+                        participantData[indexInParticipantData].answers,
+                        "name",
+                        optionName
                     );
-                }
+                    if (indexInAnswers != -1) {
+                        singleAnswer.classList.add("selected");
+                    } else {
+                        singleAnswer.classList.remove("selected");
+                    }
+                });
+                // END multiple choice questions
             }
         });
-        localStorage.setItem("answersData", JSON.stringify(answersData));
+
+        localStorage.setItem("participantData", JSON.stringify(participantData));
     }
 
-    function init_answers_data() {
-        if (localStorage.getItem("answersData")) {
-            answersData = JSON.parse(localStorage.getItem("answersData"));
-            sync_data_to_view();
-        } else {
-            let optionBlocks = document.querySelectorAll(".option-block");
-            optionBlocks.forEach(function (singleQuestion) {
-                let option = [];
-                for (
-                    let index = 0;
-                    index < singleQuestion.children.length;
-                    index++
-                ) {
-                    option.push({ isChosen: false });
-                }
-                answersData.push({
-                    isAnswered: false,
-                    option,
-                });
-            });
+    function init_participant_data() {
+        if (localStorage.getItem("participantData")) {
+            participantData = JSON.parse(
+                localStorage.getItem("participantData")
+            );
+            sync_participant_data_to_view();
         }
     }
-    setInterval(function () {
-        console.log(answersData);
-    }, 2000);
+
+    // setInterval(function () {
+    //     console.log(participantData);
+    // }, 2000);
 }
+
+
+/* START helper functions */
+function find_related_parent_by_className(node, className) {
+    let isFindParent = false;
+    let parent = node;
+    // prevent infinite loop
+    let counter = 0;
+    while (!isFindParent && counter <= 5) {
+        if (
+            parent &&
+            parent.className &&
+            parent.className.toString().includes(className)
+        ) {
+            isFindParent = true;
+        } else {
+            parent = parent.parentNode ? parent.parentNode : parent;
+        }
+        counter = counter + 1;
+    }
+    if (isFindParent) {
+        return parent;
+    } else {
+        return false;
+    }
+}
+/* END helper functions */
