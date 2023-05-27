@@ -10,89 +10,26 @@ let quizData = {
             answers: [
                 {
                     name: "جواب یک",
+                    priority: "",
+                    isCorrect: true,
                 },
                 {
                     name: "جواب دو",
+                    priority: "",
+                    isCorrect: false,
                 },
                 {
                     name: "جواب سه",
+                    priority: "",
+                    isCorrect: false,
                 },
             ],
             settings: {
                 type: "",
                 weight: "",
             },
-        },
-        {
-            id: 5,
-            name: "سوال دوم",
-            description: "",
-            answers: [
-                {
-                    name: "",
-                },
-                {
-                    name: "",
-                },
-            ],
-            settings: {
-                type: "",
-                weight: "",
-            },
-        },
-        {
-            id: 6,
-            name: "سلام این سوال اوله",
-            description: "",
-            answers: [
-                {
-                    name: "",
-                },
-                {
-                    name: "",
-                },
-            ],
-            settings: {
-                type: "",
-                weight: "",
-            },
-        },
-        {
-            id: 10,
-            name: "سلام این سوال اوله",
-            description: "",
-            answers: [
-                {
-                    name: "",
-                },
-                {
-                    name: "",
-                },
-            ],
-            settings: {
-                type: "",
-                weight: "",
-            },
-        },
-        {
+        },{
             id: 15,
-            name: "سلام این سوال اوله",
-            description: "",
-            answers: [
-                {
-                    name: "",
-                },
-                {
-                    name: "",
-                },
-            ],
-            settings: {
-                type: "",
-                weight: "",
-            },
-        },
-        {
-            id: 23,
             name: "سلام این سوال اوله",
             description: "",
             answers: [
@@ -168,7 +105,6 @@ let quizData = {
         },
     ],
 };
-
 
 // make a copy of parts of html source
 let clonedMultipleChoiceAnswer = document
@@ -259,7 +195,6 @@ function append_all_questions_into_html(quizData, parentNode) {
     }
 }
 create_quiz(quizData);
-
 
 const QUESTION_TYPES = {
     type1: "single-option",
@@ -774,7 +709,10 @@ function exam_is_ready_to_start() {
             }
         });
 
-        localStorage.setItem("participantData", JSON.stringify(participantData));
+        localStorage.setItem(
+            "participantData",
+            JSON.stringify(participantData)
+        );
     }
 
     function init_participant_data() {
@@ -786,11 +724,10 @@ function exam_is_ready_to_start() {
         }
     }
 
-    // setInterval(function () {
-    //     console.log(participantData);
-    // }, 2000);
+    setInterval(function () {
+        console.log(participantData);
+    }, 2000);
 }
-
 
 /* START helper functions */
 function find_related_parent_by_className(node, className) {
@@ -817,3 +754,30 @@ function find_related_parent_by_className(node, className) {
     }
 }
 /* END helper functions */
+
+/* Start quiz emendate */
+function emendate_participant_data_with_single_quiz_data(
+    quizData,
+    group,
+    participantData = null
+) {
+    let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData,group);
+    let questionCount = singleQuizData.questions.length;
+    console.log(questionCount);
+}
+emendate_participant_data_with_single_quiz_data(quizData,1)
+function get_quiz_sub_data_by_quiz_group(quizData, group) {
+    if (quizData.group == group) {
+        return quizData;
+    } else {
+        if (quizData.childs) {
+            for (let index = 0; index < quizData.childs.length; index++) {
+                return get_quiz_sub_data_by_quiz_group(
+                    quizData.childs[index],
+                    group
+                );
+            }
+        }
+    }
+}
+/* END quiz correction */
