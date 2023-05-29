@@ -2,19 +2,21 @@
 
 function degardc_quiz_builder_callback($atts)
 {
-    global $wpdb;
-    $column = "options";
-    $id = $atts['id'];
-    $table = $wpdb->prefix . 'degardcquiz_quizes';
-    $quiz_data = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $id")->$column);
-    $quiz_name = $quiz_data->name;
-    $quiz_description = $quiz_data->description;
-    $quiz_questions = $quiz_data->questions;
-    $quiz_settings = $quiz_data->settings;
+    // global $wpdb;
+    // $column = "options";
+    // $id = $atts['id'];
+    // $table = $wpdb->prefix . 'degardcquiz_quizes';
+    // $quiz_data = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $id")->$column);
+    // $quiz_name = $quiz_data->name;
+    // $quiz_description = $quiz_data->description;
+    // $quiz_questions = $quiz_data->questions;
+    // $quiz_settings = $quiz_data->settings;
     
 ?>
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/persian-datepicker.min.css' ?>" />
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/index.css' ?>" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
 
     <div class="dg-main-container overflow-hidden relative flex flex-col justify-center items-center px-2 w-full h-screen my-6">
         <div class="bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
@@ -38,7 +40,7 @@ function degardc_quiz_builder_callback($atts)
             </div>
 
             <div class="flex justify-center bg-white p-5 md:p-7 lg:p-10 rounded-b-xl absolute bottom-5 w-full transition-all duration-[0.9s] ease-in-out">
-                <button class="dg-start-exam-button dg-next-step-button w-full text-center cursor-pointer rounded-xl p-3 text-white" style="max-width: 500px;">
+                <button class="dg-start-exam-button dg-next-step-button dg-next-question-button w-full text-center cursor-pointer rounded-xl p-3 text-white" style="max-width: 500px;">
                     شروع آزمون
                 </button>
             </div>
@@ -79,7 +81,7 @@ function degardc_quiz_builder_callback($atts)
 
 
         <div class="register-on-site dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
-            <div class="flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
+            <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
                 <div class="text-center my-2">
                     <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
                         نتیجه آزمون به شماره شما ارسال خواهد شد
@@ -114,7 +116,7 @@ function degardc_quiz_builder_callback($atts)
 
 
         <div class="mobile-number-validation dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
-            <div class="flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
+            <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
                 <div class="text-center my-2">
                     <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
                         کد تایید ارسال شده را وارد کنید
@@ -136,7 +138,7 @@ function degardc_quiz_builder_callback($atts)
         </div>
 
         <div class="book-an-appointment flex justify-center dg-question-card dg-after-exam-question dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out items-center">
-            <div class="p-5 md:p-7 lg:p-10">
+            <div class="dg-step-block p-5 md:p-7 lg:p-10">
                 <div class="question text-2xl my-5 mb-7">
                     نوع آزمون شفاهی تعیین سطح خود را مشخص کنید
                 </div>

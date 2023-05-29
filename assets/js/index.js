@@ -21,23 +21,28 @@ let quizData = {
                 {
                     name: "جواب سه",
                     priority: "",
-                    isCorrect: false,
+                    isCorrect: true,
                 },
             ],
             settings: {
                 type: "",
                 weight: "",
             },
-        },{
+        },
+        {
             id: 15,
             name: "سلام این سوال اوله",
             description: "",
             answers: [
                 {
                     name: "",
+                    priority: "",
+                    isCorrect: true,
                 },
                 {
                     name: "",
+                    priority: "",
+                    isCorrect: true,
                 },
             ],
             settings: {
@@ -105,7 +110,10 @@ let quizData = {
         },
     ],
 };
-
+let quizResult = {
+    groupResult: {},
+    totalScore: "",
+};
 // make a copy of parts of html source
 let clonedMultipleChoiceAnswer = document
     .querySelector(".sample-multiple-choice-answer")
@@ -170,12 +178,16 @@ function create_quiz(quizData) {
     if (quizData.settings.registerOnSite) {
         mainParent.appendChild(clonedRegisterOnSite);
     }
+    //validate mobile
     if (quizData.settings.validateMobileNumber) {
         mainParent.appendChild(clonedMobileNumberValidation);
     }
+    //book an appointment
     if (quizData.settings.bookAnAppointment) {
         mainParent.appendChild(clonedBookAnAppointment);
     }
+
+    //show result
     mainParent.appendChild(clonedResult);
 }
 function append_all_questions_into_html(quizData, parentNode) {
@@ -412,6 +424,9 @@ function exam_is_ready_to_start() {
 
     let nextStepButton = document.querySelectorAll(".dg-next-step-button");
     let prevStepButton = document.querySelectorAll(".dg-prev-step-button");
+    let nextQuestionButton = document.querySelectorAll(
+        ".dg-next-question-button"
+    );
     let allOptions = document.querySelectorAll(".option");
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
@@ -435,6 +450,24 @@ function exam_is_ready_to_start() {
         });
     });
 
+    nextQuestionButton.forEach(function (singleNextButton) {
+        singleNextButton.addEventListener("click", function (e) {
+            let group = find_quiz_group_from_next_button(e.target);
+            emendate_participant_data_with_single_quiz_data(
+                quizData,
+                group,
+                participantData
+            );
+        });
+    });
+
+    function find_quiz_group_from_next_button(nodeButton) {
+        let parent = find_related_parent_by_className(
+            nodeButton,
+            "dg-question-card"
+        );
+        return parent.querySelector(".answer-block").dataset.qgroup;
+    }
     function go_to_next_step_animations(index) {
         if (!stepCards[+(index + 1)]) {
             return;
@@ -725,7 +758,7 @@ function exam_is_ready_to_start() {
     }
 
     setInterval(function () {
-        console.log(participantData);
+        console.log(quizResult);
     }, 2000);
 }
 
@@ -761,11 +794,62 @@ function emendate_participant_data_with_single_quiz_data(
     group,
     participantData = null
 ) {
-    let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData,group);
+    let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
     let questionCount = singleQuizData.questions.length;
-    console.log(questionCount);
+    let totalScore = 0;
+    participantData.forEach(function (singleAnswer) {
+        if (singleAnswer.quizGroup == group) {
+            let question = get_question_in_sub_data_by_question_id(
+                singleQuizData,
+                singleAnswer.questionId
+            );
+            if (
+                singleAnswer.questionId == question.id &&
+                singleAnswer.answers.length
+            ) {
+                let scoreTakenFromSingleQuestion =
+                    check_answer_with_question_data_and_return_score(
+                        question,
+                        singleAnswer
+                    );
+                totalScore = totalScore + scoreTakenFromSingleQuestion;
+            }
+        }
+    });
+    update_quiz_result(
+        group,
+        (totalScore / questionCount) * 100,
+        questionCount
+    );
 }
-emendate_participant_data_with_single_quiz_data(quizData,1)
+function check_answer_with_question_data_and_return_score(
+    question,
+    participantAnswer
+) {
+    let score = 1;
+
+    /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
+    participantAnswer.answers.forEach(function (singleParticipantAnswer) {
+        question.answers.forEach(function (singleQuestionAnswer) {
+            if (
+                singleParticipantAnswer.name == singleQuestionAnswer.name &&
+                !singleQuestionAnswer.isCorrect
+            ) {
+                score = 0;
+            }
+        });
+    });
+    return score;
+    /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
+}
+
+function get_question_in_sub_data_by_question_id(subData, questionId) {
+    for (let index = 0; index < subData.questions.length; index++) {
+        if (subData.questions[index].id == questionId) {
+            return subData.questions[index];
+        }
+    }
+}
 function get_quiz_sub_data_by_quiz_group(quizData, group) {
     if (quizData.group == group) {
         return quizData;
@@ -779,5 +863,25 @@ function get_quiz_sub_data_by_quiz_group(quizData, group) {
             }
         }
     }
+}
+function update_quiz_result(group, score, questionCount) {
+    let sum = 0;
+    let questionCountTotal = 0;
+    if (!quizResult.groupResult[group]) {
+        //insert
+        quizResult.groupResult[group] = {};
+    }
+    quizResult.groupResult[group].score = score;
+    quizResult.groupResult[group].questionCount = questionCount;
+    for (const key in quizResult.groupResult) {
+        sum =
+            sum +
+            quizResult.groupResult[key].score *
+                quizResult.groupResult[key].questionCount;
+        questionCountTotal =
+            questionCountTotal + quizResult.groupResult[key].questionCount;
+    }
+    quizResult.totalScore = sum / questionCountTotal;
+    // we can add weight to every single quiz group and make weighted average
 }
 /* END quiz correction */
