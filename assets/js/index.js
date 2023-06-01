@@ -52,7 +52,7 @@ let quizData = {
         },
         {
             id: 24,
-            name: "سلام این سوال اوله",
+            name: "سلام این سوال آخخخخر",
             description: "",
             answers: [
                 {
@@ -69,7 +69,7 @@ let quizData = {
         },
     ],
     settings: {
-        requireScore: "0",
+        requireScore: 30,
         validateMobileNumber: true,
         registerOnSite: true,
         seprateResult: true,
@@ -100,7 +100,7 @@ let quizData = {
                 },
             ],
             settings: {
-                requireScore: "0",
+                requireScore: 50,
                 validateMobileNumber: true,
                 registerOnSite: true,
                 seprateResult: true,
@@ -110,10 +110,7 @@ let quizData = {
         },
     ],
 };
-let quizResult = {
-    groupResult: {},
-    totalScore: "",
-};
+
 // make a copy of parts of html source
 let clonedMultipleChoiceAnswer = document
     .querySelector(".sample-multiple-choice-answer")
@@ -164,6 +161,18 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     });
     return newQuestion;
 }
+function change_question_if_last_or_first(quizData, newQuestion, index) {
+    if (index == 0) {
+        newQuestion.dataset.qfirst = true;
+        let prevStepButton = newQuestion.querySelector(".dg-prev-step-button");
+        prevStepButton.style.display = "none";
+      }
+      if (index == quizData.questions.length - 1) {
+        newQuestion.dataset.qlast = true;
+        let nextStepButton = newQuestion.querySelector(".dg-next-step-button");
+        nextStepButton.innerHTML = "تایید نهایی";
+    }
+}
 function create_quiz(quizData) {
     let mainParent = document.querySelector(".dg-main-container");
     //name and description
@@ -192,12 +201,15 @@ function create_quiz(quizData) {
 }
 function append_all_questions_into_html(quizData, parentNode) {
     if (quizData.questions) {
-        quizData.questions.forEach(function (singleQuestion) {
+        quizData.questions.forEach(function (singleQuestion, index) {
             // TODO check question type -> singleQuestion.settings.type
             // multiple choice
-            parentNode.appendChild(
-                create_multiple_choice_question(singleQuestion, quizData.group)
+            let newQuestion = create_multiple_choice_question(
+                singleQuestion,
+                quizData.group
             );
+            change_question_if_last_or_first(quizData, newQuestion, index);
+            parentNode.appendChild(newQuestion);
         });
     }
     if (quizData.childs) {
@@ -421,7 +433,6 @@ function exam_is_ready_to_start() {
     let progressBar = document.querySelector(".dg-progress-bar");
     let participantData = [];
     let currentIndex = 1;
-
     let nextStepButton = document.querySelectorAll(".dg-next-step-button");
     let prevStepButton = document.querySelectorAll(".dg-prev-step-button");
     let nextQuestionButton = document.querySelectorAll(
@@ -430,6 +441,10 @@ function exam_is_ready_to_start() {
     let allOptions = document.querySelectorAll(".option");
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
+    let quizResult = {
+        groupResult: {},
+        totalScore: "",
+    };
 
     init_view();
     init_participant_data();
@@ -440,6 +455,11 @@ function exam_is_ready_to_start() {
 
     nextStepButton.forEach(function (singleNextButton, index) {
         singleNextButton.addEventListener("click", function () {
+          let q = 0;
+            while (q<50000) {
+              q = q + 1 ;
+              console.log(q);
+            }
             go_to_next_step_animations(index);
         });
     });
@@ -453,11 +473,22 @@ function exam_is_ready_to_start() {
     nextQuestionButton.forEach(function (singleNextButton) {
         singleNextButton.addEventListener("click", function (e) {
             let group = find_quiz_group_from_next_button(e.target);
-            emendate_participant_data_with_single_quiz_data(
-                quizData,
-                group,
-                participantData
-            );
+            if (check_if_is_it_last_question_in_group(e.target)) {
+                let result = emendate_participant_data_with_single_quiz_data(
+                    quizData,
+                    group,
+                    participantData
+                );
+                update_quiz_result(group, result.score, result.questionCount);
+                if (
+                    !check_if_is_allow_to_participate_in_next_group(
+                        quizData,
+                        group
+                    )
+                ) {
+                    remove_extra_questions(e.target);
+                }
+            }
         });
     });
 
@@ -508,9 +539,10 @@ function exam_is_ready_to_start() {
             stepCards[+(index + 2)].style.transform =
                 "matrix(0.95, 0, 0 , 0.95 , 0 , 28)";
             stepCards[+(index + 2)].style.opacity = "50%";
-        } else {
-            stepCards[+(index + 2)].style.opacity = "0%";
         }
+        //  else {
+        //     stepCards[+(index + 2)].style.opacity = "0%";
+        // }
 
         // 3 next question animation
         if (!stepCards[+(index + 3)]) {
@@ -520,9 +552,10 @@ function exam_is_ready_to_start() {
             stepCards[+(index + 3)].style.transform =
                 "matrix(0.90, 0, 0 , 0.90 , 0 , 52)";
             stepCards[+(index + 3)].style.opacity = "25%";
-        } else {
-            stepCards[+(index + 3)].style.opacity = "0%";
         }
+        // else {
+        //     stepCards[+(index + 3)].style.opacity = "0%";
+        // }
     }
 
     function back_to_prev_step_animations(index) {
@@ -558,9 +591,10 @@ function exam_is_ready_to_start() {
             stepCards[+(index + 1)].style.transform =
                 "matrix(0.9, 0, 0 , 0.9 , 0 , 52)";
             stepCards[+(index + 1)].style.opacity = "25%";
-        } else {
-            stepCards[+(index + 1)].style.opacity = "0%";
         }
+        // else {
+        //     stepCards[+(index + 1)].style.opacity = "0%";
+        // }
 
         // 2 next question animation
         if (!stepCards[+(index + 2)]) {
@@ -570,7 +604,7 @@ function exam_is_ready_to_start() {
             stepCards[+(index + 2)].style.transform =
                 "matrix(0.9, 0, 0 , 0.9 , 0 , 52)";
         }
-        stepCards[+(index + 2)].style.opacity = "0%";
+        // stepCards[+(index + 2)].style.opacity = "0%";
     }
 
     function handle_click_on_answer(e) {
@@ -675,9 +709,7 @@ function exam_is_ready_to_start() {
     function init_view() {
         // init step cards after exam (doesn't contain question of exam)
         for (let index = 0; index < stepCards.length; index++) {
-            if (!stepCards[index].classList.contains("dg-question-card")) {
-                stepCards[index].style.opacity = "0%";
-            }
+            //TODO
             setTimeout(function () {
                 stepCards[index].style.transitionDuration =
                     animationDuration / 1000 + "s";
@@ -757,6 +789,132 @@ function exam_is_ready_to_start() {
         }
     }
 
+    /* Start quiz emendate */
+    function emendate_participant_data_with_single_quiz_data(
+        quizData,
+        group,
+        participantData = null
+    ) {
+        let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
+        let questionCount = singleQuizData.questions.length;
+        let groupScore = 0;
+        participantData.forEach(function (singleAnswer) {
+            if (singleAnswer.quizGroup == group) {
+                let question = get_question_in_sub_data_by_question_id(
+                    singleQuizData,
+                    singleAnswer.questionId
+                );
+                if (
+                    singleAnswer.questionId == question.id &&
+                    singleAnswer.answers.length
+                ) {
+                    let scoreTakenFromSingleQuestion =
+                        check_answer_with_question_data_and_return_score(
+                            question,
+                            singleAnswer
+                        );
+                    groupScore = groupScore + scoreTakenFromSingleQuestion;
+                }
+            }
+        });
+        return {
+            score: (groupScore / questionCount) * 100,
+            questionCount,
+        };
+    }
+    function check_answer_with_question_data_and_return_score(
+        question,
+        participantAnswer
+    ) {
+        let score = 1;
+
+        /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
+        participantAnswer.answers.forEach(function (singleParticipantAnswer) {
+            question.answers.forEach(function (singleQuestionAnswer) {
+                if (
+                    singleParticipantAnswer.name == singleQuestionAnswer.name &&
+                    !singleQuestionAnswer.isCorrect
+                ) {
+                    score = 0;
+                }
+            });
+        });
+        return score;
+        /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
+    }
+
+    function get_question_in_sub_data_by_question_id(subData, questionId) {
+        for (let index = 0; index < subData.questions.length; index++) {
+            if (subData.questions[index].id == questionId) {
+                return subData.questions[index];
+            }
+        }
+    }
+    function get_quiz_sub_data_by_quiz_group(quizData, group) {
+        if (quizData.group == group) {
+            return quizData;
+        } else {
+            if (quizData.childs) {
+                for (let index = 0; index < quizData.childs.length; index++) {
+                    return get_quiz_sub_data_by_quiz_group(
+                        quizData.childs[index],
+                        group
+                    );
+                }
+            }
+        }
+    }
+    function update_quiz_result(group, score, questionCount) {
+        let sum = 0;
+        let questionCountTotal = 0;
+        if (!quizResult.groupResult[group]) {
+            //insert
+            quizResult.groupResult[group] = {};
+        }
+        quizResult.groupResult[group].score = score;
+        quizResult.groupResult[group].questionCount = questionCount;
+        for (const key in quizResult.groupResult) {
+            sum =
+                sum +
+                quizResult.groupResult[key].score *
+                    quizResult.groupResult[key].questionCount;
+            questionCountTotal =
+                questionCountTotal + quizResult.groupResult[key].questionCount;
+        }
+        quizResult.totalScore = sum / questionCountTotal;
+        // we can add weight to every single quiz group and make weighted average
+    }
+    /* END quiz correction */
+    function check_if_is_allow_to_participate_in_next_group(quizData, group) {
+        let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
+        let requireScore = +singleQuizData.settings.requireScore;
+        let takenScore = +quizResult.groupResult[group].score;
+        return requireScore <= takenScore ? true : false;
+    }
+    function check_if_is_it_last_question_in_group(nodeButton) {
+        let parent = find_related_parent_by_className(
+            nodeButton,
+            "dg-question-card"
+        );
+        return parent.dataset.qlast ? true : false;
+    }
+    function remove_extra_questions(nodeButton) {
+        let parent = find_related_parent_by_className(
+            nodeButton,
+            "dg-question-card"
+        );
+        let lastqnumber = parent.dataset.qnumber;
+        let stepCards = document.querySelectorAll(".dg-step-card");
+        for (let index = 0; index < stepCards.length; index++) {
+            if (
+                stepCards[index].dataset.qnumber > lastqnumber &&
+                stepCards[index].classList.contains("dg-question-card") &&
+                !stepCards[index].classList.contains("dg-after-exam-question")
+            ) {
+                stepCards[index].remove();
+            }
+        }
+    }
     setInterval(function () {
         console.log(quizResult);
     }, 2000);
@@ -787,101 +945,3 @@ function find_related_parent_by_className(node, className) {
     }
 }
 /* END helper functions */
-
-/* Start quiz emendate */
-function emendate_participant_data_with_single_quiz_data(
-    quizData,
-    group,
-    participantData = null
-) {
-    let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
-    let questionCount = singleQuizData.questions.length;
-    let totalScore = 0;
-    participantData.forEach(function (singleAnswer) {
-        if (singleAnswer.quizGroup == group) {
-            let question = get_question_in_sub_data_by_question_id(
-                singleQuizData,
-                singleAnswer.questionId
-            );
-            if (
-                singleAnswer.questionId == question.id &&
-                singleAnswer.answers.length
-            ) {
-                let scoreTakenFromSingleQuestion =
-                    check_answer_with_question_data_and_return_score(
-                        question,
-                        singleAnswer
-                    );
-                totalScore = totalScore + scoreTakenFromSingleQuestion;
-            }
-        }
-    });
-    update_quiz_result(
-        group,
-        (totalScore / questionCount) * 100,
-        questionCount
-    );
-}
-function check_answer_with_question_data_and_return_score(
-    question,
-    participantAnswer
-) {
-    let score = 1;
-
-    /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
-    participantAnswer.answers.forEach(function (singleParticipantAnswer) {
-        question.answers.forEach(function (singleQuestionAnswer) {
-            if (
-                singleParticipantAnswer.name == singleQuestionAnswer.name &&
-                !singleQuestionAnswer.isCorrect
-            ) {
-                score = 0;
-            }
-        });
-    });
-    return score;
-    /* ALGORYTHM 1 - only answer is correct if it is the as same as asnwer paper */
-}
-
-function get_question_in_sub_data_by_question_id(subData, questionId) {
-    for (let index = 0; index < subData.questions.length; index++) {
-        if (subData.questions[index].id == questionId) {
-            return subData.questions[index];
-        }
-    }
-}
-function get_quiz_sub_data_by_quiz_group(quizData, group) {
-    if (quizData.group == group) {
-        return quizData;
-    } else {
-        if (quizData.childs) {
-            for (let index = 0; index < quizData.childs.length; index++) {
-                return get_quiz_sub_data_by_quiz_group(
-                    quizData.childs[index],
-                    group
-                );
-            }
-        }
-    }
-}
-function update_quiz_result(group, score, questionCount) {
-    let sum = 0;
-    let questionCountTotal = 0;
-    if (!quizResult.groupResult[group]) {
-        //insert
-        quizResult.groupResult[group] = {};
-    }
-    quizResult.groupResult[group].score = score;
-    quizResult.groupResult[group].questionCount = questionCount;
-    for (const key in quizResult.groupResult) {
-        sum =
-            sum +
-            quizResult.groupResult[key].score *
-                quizResult.groupResult[key].questionCount;
-        questionCountTotal =
-            questionCountTotal + quizResult.groupResult[key].questionCount;
-    }
-    quizResult.totalScore = sum / questionCountTotal;
-    // we can add weight to every single quiz group and make weighted average
-}
-/* END quiz correction */

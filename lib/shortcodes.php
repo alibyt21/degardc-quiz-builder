@@ -69,10 +69,10 @@ function degardc_quiz_builder_callback($atts)
             </div>
 
             <div class="flex justify-between p-5 bg-white md:p-7 lg:p-10 rounded-b-xl absolute bottom-0 w-full">
-                <button class="dg-prev-question-button dg-prev-step-button hover:bg-[#efefef] transition-all duration-300 ease-in-out border border-solid border-gray-300 cursor-pointer w-full rounded-xl p-3 last:mr-5">
+                <button class="dg-prev-question-button dg-prev-step-button hover:bg-[#efefef] transition-all duration-300 ease-in-out border border-solid border-gray-300 cursor-pointer w-full rounded-xl p-3 ml-5">
                     قبلی
                 </button>
-                <button class="dg-next-question-button dg-next-step-button transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 last:mr-5 text-white">
+                <button class="dg-next-question-button dg-next-step-button transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
                     بعدی
                 </button>
             </div>
@@ -107,7 +107,7 @@ function degardc_quiz_builder_callback($atts)
                 <button class="dg-next-step-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
                     تایید شماره
                 </button>
-                <button class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
+                <button style="display: none;" class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
                     بازگشت به آزمون
                 </button>
             </div>
@@ -175,7 +175,7 @@ function degardc_quiz_builder_callback($atts)
         </div>
 
 
-        <div class="result flex justify-center dg-question-card dg-after-exam-question dg-step-card absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out items-center">
+        <div class="result flex justify-center dg-step-card absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out items-center">
             
             salam
         </div>
