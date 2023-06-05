@@ -12,6 +12,16 @@ if (!function_exists('faraz_sms_pattern')) {
         return $response;
     }
 }
+if (!function_exists('is_mobile_number_valid_in_iran')) {
+    function is_mobile_number_valid_in_iran($mobile_number)
+    {
+        if (preg_match("/^09[0-9]{9}$/", $mobile_number) || preg_match("/^9[0-9]{9}$/", $mobile_number)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
 
 
 function senddata($array)

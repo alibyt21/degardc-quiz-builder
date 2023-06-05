@@ -2,6 +2,15 @@ let quizData = {
     group: 1,
     name: "اولین آزمون زبان انگلیسی",
     description: "یسری توضیحات",
+    settings: {
+        requireScore: 56,
+        collectMobileNumber: true,
+        validateMobileNumber: true,
+        registerOnSite: false,
+        seprateResult: true,
+        showResult: true,
+        bookAnAppointment: true,
+    },
     questions: [
         {
             id: 1,
@@ -21,7 +30,7 @@ let quizData = {
                 {
                     name: "جواب سه",
                     priority: "",
-                    isCorrect: true,
+                    isCorrect: false,
                 },
             ],
             settings: {
@@ -30,36 +39,24 @@ let quizData = {
             },
         },
         {
-            id: 15,
+            id: 2,
             name: "سلام این سوال اوله",
             description: "",
             answers: [
                 {
-                    name: "",
+                    name: "جواب یک",
                     priority: "",
                     isCorrect: true,
                 },
                 {
-                    name: "",
+                    name: "جواب دو",
                     priority: "",
-                    isCorrect: true,
-                },
-            ],
-            settings: {
-                type: "",
-                weight: "",
-            },
-        },
-        {
-            id: 24,
-            name: "سلام این سوال آخخخخر",
-            description: "",
-            answers: [
-                {
-                    name: "",
+                    isCorrect: false,
                 },
                 {
-                    name: "",
+                    name: "جواب سه",
+                    priority: "",
+                    isCorrect: false,
                 },
             ],
             settings: {
@@ -68,22 +65,16 @@ let quizData = {
             },
         },
     ],
-    settings: {
-        requireScore: 30,
-        validateMobileNumber: true,
-        registerOnSite: true,
-        seprateResult: true,
-        bookAnAppointment: true,
-    },
+
     childs: [
         {
             group: 15,
-            name: "",
-            description: "",
+            name: "یک نام تستی برای گروه 15",
+            description: "یکسری توضیحات تستی برای گروه 15",
             questions: [
                 {
                     id: 24,
-                    name: "سوال سوم",
+                    name: "گروه دوم یک",
                     description: "",
                     answers: [
                         {
@@ -100,7 +91,39 @@ let quizData = {
                 },
             ],
             settings: {
-                requireScore: 50,
+                requireScore: 69,
+                validateMobileNumber: true,
+                registerOnSite: true,
+                seprateResult: true,
+                bookAnAppointment: true,
+            },
+            childs: null,
+        },
+        {
+            group: 17,
+            name: "یک نام تستی برای گروه 17",
+            description: "یکسری توضیحات تستی برای گروه 15",
+            questions: [
+                {
+                    id: 24,
+                    name: "گروه هفدهم یک",
+                    description: "",
+                    answers: [
+                        {
+                            name: "",
+                        },
+                        {
+                            name: "",
+                        },
+                    ],
+                    settings: {
+                        type: "",
+                        weight: "",
+                    },
+                },
+            ],
+            settings: {
+                requireScore: 0,
                 validateMobileNumber: true,
                 registerOnSite: true,
                 seprateResult: true,
@@ -122,15 +145,25 @@ let clonedMultipleChoiceQuestion = document
     .cloneNode(true);
 document.querySelector(".sample-multiple-choice-question").remove();
 
-let clonedMobileNumberValidation = document
-    .querySelector(".mobile-number-validation")
+let clonedCollectMobileNumber = document
+    .querySelector(".collect-mobile-number")
     .cloneNode(true);
-document.querySelector(".mobile-number-validation").remove();
+document.querySelector(".collect-mobile-number").remove();
 
-let clonedRegisterOnSite = document
-    .querySelector(".register-on-site")
+let clonedRegisterValidate = document
+    .querySelector(".register-validate")
     .cloneNode(true);
-document.querySelector(".register-on-site").remove();
+document.querySelector(".register-validate").remove();
+
+let clonedOnlyValidate = document
+    .querySelector(".only-validate")
+    .cloneNode(true);
+document.querySelector(".only-validate").remove();
+
+let clonedOnlyRegister = document
+    .querySelector(".only-register")
+    .cloneNode(true);
+document.querySelector(".only-register").remove();
 
 let clonedBookAnAppointment = document
     .querySelector(".book-an-appointment")
@@ -138,6 +171,10 @@ let clonedBookAnAppointment = document
 //remove orginals from html
 document.querySelector(".book-an-appointment").remove();
 
+let clonedSingleResult = document
+    .querySelector(".dg-single-result")
+    .cloneNode(true);
+document.querySelector(".dg-single-result").remove();
 let clonedResult = document.querySelector(".result").cloneNode(true);
 document.querySelector(".result").remove();
 
@@ -166,8 +203,8 @@ function change_question_if_last_or_first(quizData, newQuestion, index) {
         newQuestion.dataset.qfirst = true;
         let prevStepButton = newQuestion.querySelector(".dg-prev-step-button");
         prevStepButton.style.display = "none";
-      }
-      if (index == quizData.questions.length - 1) {
+    }
+    if (index == quizData.questions.length - 1) {
         newQuestion.dataset.qlast = true;
         let nextStepButton = newQuestion.querySelector(".dg-next-step-button");
         nextStepButton.innerHTML = "تایید نهایی";
@@ -183,14 +220,33 @@ function create_quiz(quizData) {
     //questions
     append_all_questions_into_html(quizData, mainParent);
 
-    //register on site
-    if (quizData.settings.registerOnSite) {
-        mainParent.appendChild(clonedRegisterOnSite);
+    //collect mobile number
+    if (quizData.settings.collectMobileNumber) {
+        mainParent.appendChild(clonedCollectMobileNumber);
     }
-    //validate mobile
-    if (quizData.settings.validateMobileNumber) {
-        mainParent.appendChild(clonedMobileNumberValidation);
+    if (
+        quizData.settings.collectMobileNumber &&
+        quizData.settings.validateMobileNumber &&
+        quizData.settings.registerOnSite
+    ) {
+        //register-validate
+        mainParent.appendChild(clonedRegisterValidate);
+    } else if (
+        quizData.settings.collectMobileNumber &&
+        quizData.settings.validateMobileNumber &&
+        !quizData.settings.registerOnSite
+    ) {
+        //only-validate
+        mainParent.appendChild(clonedOnlyValidate);
+    } else if (
+        (!quizData.settings.collectMobileNumber ||
+            !quizData.settings.validateMobileNumber) &&
+        quizData.settings.registerOnSite
+    ) {
+        //only-register
+        mainParent.appendChild(clonedOnlyRegister);
     }
+
     //book an appointment
     if (quizData.settings.bookAnAppointment) {
         mainParent.appendChild(clonedBookAnAppointment);
@@ -441,10 +497,14 @@ function exam_is_ready_to_start() {
     let allOptions = document.querySelectorAll(".option");
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
+    let sendNewCode = document.getElementById("dg-send-new-code");
+
     let quizResult = {
         groupResult: {},
         totalScore: "",
     };
+    let insertedId = -1;
+    let interval;
 
     init_view();
     init_participant_data();
@@ -453,27 +513,11 @@ function exam_is_ready_to_start() {
         singleAnswer.addEventListener("click", handle_click_on_answer);
     });
 
+    /* every thing happend here */
     nextStepButton.forEach(function (singleNextButton, index) {
-        singleNextButton.addEventListener("click", function () {
-          let q = 0;
-            while (q<50000) {
-              q = q + 1 ;
-              console.log(q);
-            }
-            go_to_next_step_animations(index);
-        });
-    });
-
-    prevStepButton.forEach(function (singlePrevButton, index) {
-        singlePrevButton.addEventListener("click", function () {
-            back_to_prev_step_animations(index + 1);
-        });
-    });
-
-    nextQuestionButton.forEach(function (singleNextButton) {
-        singleNextButton.addEventListener("click", function (e) {
-            let group = find_quiz_group_from_next_button(e.target);
+        singleNextButton.addEventListener("click", async function (e) {
             if (check_if_is_it_last_question_in_group(e.target)) {
+                let group = find_quiz_group_from_next_button(e.target);
                 let result = emendate_participant_data_with_single_quiz_data(
                     quizData,
                     group,
@@ -487,11 +531,240 @@ function exam_is_ready_to_start() {
                     )
                 ) {
                     remove_extra_questions(e.target);
+                    go_to_next_step_animations(index);
+                    handle_request_to_submit_answers();
+                    create_result();
+                } else {
+                    go_to_next_step_animations(index);
                 }
+            } else if (
+                singleNextButton.classList.contains(
+                    "collect-mobile-number-button"
+                )
+            ) {
+                // collect mobile number API
+                let mobileNumber =
+                    document.getElementById("mobile-number").value;
+                if (check_mobile_number(mobileNumber)) {
+                    if (quizData.settings.validateMobileNumber) {
+                        // require validate mobile
+                        if (interval) {
+                            clearInterval(interval);
+                        }
+                        interval = count_down();
+                        go_to_next_step_animations(index);
+                        try {
+                            await handle_request_to_send_validation_code_api(
+                                mobileNumber
+                            );
+                        } catch (error) {
+                            back_to_prev_step_animations(index + 1);
+                        }
+                    } else {
+                        // just save mobile in db
+                        go_to_next_step_animations(index);
+                        try {
+                            await handle_request_to_save_unvalidate_mobile_number(
+                                mobileNumber
+                            );
+                        } catch (error) {
+                            back_to_prev_step_animations(index + 1);
+                        }
+                    }
+                }
+            } else if (
+                singleNextButton.classList.contains("register-validate-button")
+            ) {
+                // register-validate API
+                console.log("register-validate");
+            } else if (
+                singleNextButton.classList.contains("only-register-button")
+            ) {
+                // only register API
+                console.log("only-register");
+            } else if (
+                singleNextButton.classList.contains("only-validate-button")
+            ) {
+                // only validate API
+                let mobileNumber =
+                    document.getElementById("mobile-number").value;
+                let validationCode = document.getElementById("validation-code").value;
+                try {
+                    await handle_request_to_check_validation_code(
+                        validationCode,
+                        mobileNumber
+                    );
+                    go_to_next_step_animations(index);
+                } catch (error) {
+                }
+            } else {
+                // default - for questions next buttons
+                go_to_next_step_animations(index);
             }
         });
     });
 
+    prevStepButton.forEach(function (singlePrevButton, index) {
+        singlePrevButton.addEventListener("click", function () {
+            back_to_prev_step_animations(index + 1);
+        });
+    });
+
+    /* START api functions */
+    async function handle_request_to_send_validation_code_api(mobileNumber) {
+        if (insertedId == -1) {
+            setTimeout(() => {
+                handle_request_to_send_validation_code_api(mobileNumber);
+            }, 1000);
+            return;
+        }
+        // send request to send validation code
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_send_validation_code_ajax",
+                mobileNumber,
+                insertedId,
+            });
+            if (response.error) {
+                show_notif(response.message, "error");
+            } else {
+                show_notif(response.message, "success");
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
+
+    async function handle_request_to_check_validation_code(
+        validationCode,
+        mobileNumber
+    ) {
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_check_validation_code",
+                validationCode,
+                mobileNumber,
+                insertedId,
+            });
+            if (response.error) {
+                show_notif(response.message, "error");
+                throw new Error();
+            } else {
+                // nothing in success
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
+
+    async function handle_request_to_save_unvalidate_mobile_number(
+        mobileNumber
+    ) {
+        if (insertedId == -1) {
+            setTimeout(() => {
+                handle_request_to_save_unvalidate_mobile_number(mobileNumber);
+            }, 1000);
+            return;
+        }
+        // send request to save unvalidate mobile number
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_save_unvalidate_mobile_ajax",
+                mobileNumber,
+                insertedId,
+            });
+            if (response.error) {
+                show_notif(response.message, "error");
+            } else {
+                // nothing in success
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
+    async function handle_request_to_submit_answers() {
+        let tryCount = 2;
+        try {
+            return await try_to_submit_answers();
+        } catch (error) {
+            show_notif(
+                "خطا: در ذخیره سازی اطلاعات آزمون شما خطایی رخ داده است، لطفا به پشتیبانی اطلاع دهید",
+                "error"
+            );
+            throw new Error();
+            //TODO call error log functions and save error in db
+        }
+        async function try_to_submit_answers() {
+            try {
+                tryCount = tryCount - 1;
+                let response = await request_to_api({
+                    action: "degardc_quiz_builder_submit_answers_ajax",
+                    quizId: quizData.group,
+                    participantData: JSON.stringify(participantData),
+                    quizResult: JSON.stringify(quizResult),
+                });
+                if (response && !response.error) {
+                    insertedId = response.message;
+                } else {
+                    throw new Error();
+                }
+            } catch (error) {
+                if (tryCount > 0) {
+                    await try_to_submit_answers();
+                } else {
+                    throw new Error();
+                }
+            }
+        }
+    }
+    async function request_to_api(
+        data = {
+            action: "",
+        },
+        url = degardc_quiz_builder_ajax_object.ajax_url
+    ) {
+        let tryCount = 2;
+        // error happend in network layer
+        try {
+            return await try_request(data, url);
+        } catch (error) {
+            show_notif(
+                "خطا: در برقراری ارتباط با سرور خطایی رخ داد، لطفا اتصال اینترنت خود را چک کنید و چند دقیقه بعد مجددا امتحان کنید",
+                "error"
+            );
+            throw new Error();
+        }
+        async function try_request(data, url) {
+            try {
+                tryCount = tryCount - 1;
+                let response = await fetch(url, {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Cache-Control": "no-cache",
+                    },
+                    body: new URLSearchParams(data),
+                });
+                return response.json();
+            } catch (error) {
+                if (tryCount > 0) {
+                    await try_request(data, url);
+                } else {
+                    throw new Error();
+                }
+            }
+        }
+    }
+    /* END api functions */
+
+    if (quizData.settings.validateMobileNumber) {
+        sendNewCode.addEventListener("click", function () {
+            let mobileNumber = document.getElementById("mobile-number").value;
+            count_down();
+            handle_request_to_send_validation_code_api(mobileNumber);
+        });
+    }
     function find_quiz_group_from_next_button(nodeButton) {
         let parent = find_related_parent_by_className(
             nodeButton,
@@ -789,13 +1062,14 @@ function exam_is_ready_to_start() {
         }
     }
 
-    /* Start quiz emendate */
+    /* Start quiz correction */
     function emendate_participant_data_with_single_quiz_data(
         quizData,
         group,
         participantData = null
     ) {
         let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
+        console.log(singleQuizData);
         let questionCount = singleQuizData.questions.length;
         let groupScore = 0;
         participantData.forEach(function (singleAnswer) {
@@ -856,11 +1130,20 @@ function exam_is_ready_to_start() {
         } else {
             if (quizData.childs) {
                 for (let index = 0; index < quizData.childs.length; index++) {
-                    return get_quiz_sub_data_by_quiz_group(
-                        quizData.childs[index],
-                        group
-                    );
+                    if (
+                        get_quiz_sub_data_by_quiz_group(
+                            quizData.childs[index],
+                            group
+                        )
+                    ) {
+                        return get_quiz_sub_data_by_quiz_group(
+                            quizData.childs[index],
+                            group
+                        );
+                    }
                 }
+            } else {
+                return false;
             }
         }
     }
@@ -896,7 +1179,7 @@ function exam_is_ready_to_start() {
             nodeButton,
             "dg-question-card"
         );
-        return parent.dataset.qlast ? true : false;
+        return parent && parent.dataset.qlast ? true : false;
     }
     function remove_extra_questions(nodeButton) {
         let parent = find_related_parent_by_className(
@@ -915,12 +1198,162 @@ function exam_is_ready_to_start() {
             }
         }
     }
+
+    function create_result() {
+        init_total_score();
+        if (quizData.settings.seprateResult) {
+            for (const groupId in quizResult.groupResult) {
+                let newElem = clonedSingleResult.cloneNode(true);
+                let groupData = get_quiz_sub_data_by_quiz_group(
+                    quizData,
+                    groupId
+                );
+                newElem.querySelector(".dg-single-result-name").innerHTML =
+                    groupData.name;
+                newElem.querySelector(
+                    ".dg-single-result-description"
+                ).innerHTML = groupData.description;
+                newElem.querySelector(".dg-single-result-score").innerHTML =
+                    quizResult.groupResult[groupId].score + "%";
+                clonedResult.appendChild(newElem);
+            }
+            init_ratings();
+        }
+    }
+    function init_total_score() {
+        let totalScore = parseInt(quizResult.totalScore).toFixed(0);
+        let percentageCurve = document.getElementById("percentage-curve");
+        let percentageText = document.getElementById("percentage-text");
+        percentageText.textContent = totalScore.toString();
+        var progress = 1 - totalScore / 100;
+        percentageCurve.style.strokeDashoffset = 198 * progress;
+    }
+    function init_ratings() {
+        /*
+        Conic gradients are not supported in all browsers (https://caniuse.com/#feat=css-conic-gradients), so this pen includes the CSS conic-gradient() polyfill by Lea Verou (https://leaverou.github.io/conic-gradient/)
+        */
+
+        // Find al rating items
+        const ratings = document.querySelectorAll(".rating");
+
+        // Iterate over all rating items
+        ratings.forEach((rating) => {
+            // Get content and get score as an int
+            const ratingContent = rating.innerHTML;
+            const ratingScore = parseInt(ratingContent, 10);
+
+            // Define if the score is good, meh or bad according to its value
+            const scoreClass =
+                ratingScore < 40 ? "bad" : ratingScore < 60 ? "meh" : "good";
+
+            // Add score class to the rating
+            rating.classList.add(scoreClass);
+
+            // After adding the class, get its color
+            const ratingColor = window.getComputedStyle(rating).backgroundColor;
+
+            // Define the background gradient according to the score and color
+            const gradient = `background: conic-gradient(${ratingColor} ${ratingScore}%, transparent 0 100%)`;
+
+            // Set the gradient as the rating background
+            rating.setAttribute("style", gradient);
+
+            // Wrap the content in a tag to show it above the pseudo element that masks the bar
+            rating.innerHTML = `<span>${ratingScore} ${
+                ratingContent.indexOf("%") >= 0 ? "<small>%</small>" : ""
+            }</span>`;
+        });
+    }
+
     setInterval(function () {
         console.log(quizResult);
     }, 2000);
 }
 
 /* START helper functions */
+function check_mobile_number(mobileNumber) {
+    if (!mobileNumber) {
+        show_notif("لطفا شماره همراه خود را وارد کنید", "alert");
+        return false;
+    }
+    if (!is_mobile_number_valid_in_iran(mobileNumber)) {
+        show_notif("شماره همراه وارد شده نامعتبر است", "alert");
+        return false;
+    }
+    return true;
+}
+function count_down() {
+    // Get the countdown timer element
+    let countdownContainer = document.getElementById("dg-countdown-container");
+    var countdownTimer = document.getElementById("dg-countdown-timer");
+    let sendNewCode = document.getElementById("dg-send-new-code");
+
+    // init
+    countdownContainer.style.display = "flex";
+    sendNewCode.style.display = "none";
+    // Set the minutes and seconds to countdown
+    var minutes = 0;
+    var seconds = 5;
+
+    // Calculate the total seconds
+    var totalSeconds = minutes * 60 + seconds;
+
+    // Update the countdown timer every second
+    var countdownInterval = setInterval(function () {
+        // Calculate the minutes and seconds left
+        var minutesLeft = Math.floor(totalSeconds / 60)
+            .toString()
+            .padStart(2, "0");
+        var secondsLeft = (totalSeconds % 60).toString().padStart(2, "0");
+
+        // Display the minutes and seconds left in the countdown timer element
+        countdownTimer.innerHTML = minutesLeft + ":" + secondsLeft;
+
+        // Subtract one second from the total seconds
+        totalSeconds--;
+
+        // If the countdown is finished, clear the countdown interval
+        if (totalSeconds < 0) {
+            clearInterval(countdownInterval);
+            countdownContainer.style.display = "none";
+            sendNewCode.style.display = "flex";
+        }
+    }, 1000);
+    return countdownInterval;
+}
+function show_notif(text, type = "alert") {
+    let color;
+    switch (type) {
+        case "alert":
+            color = "#333333";
+            break;
+        case "error":
+            color = "#fe597b";
+            break;
+        case "success":
+            color = "#6ac847";
+            break;
+    }
+    Toastify({
+        text,
+        duration: 5000,
+        close: false,
+        gravity: "top", // `top` or `bottom`
+        position: "center", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover
+        style: {
+            background: color,
+            borderRadius: "10px",
+            boxShadow: "0 3px 6px 0px rgba(0,0,0,.06)",
+            userSelect: "none",
+        },
+    }).showToast();
+}
+function is_mobile_number_valid_in_iran(number) {
+    var regex = new RegExp("^(\\+98|0)?9\\d{9}$");
+    var result = regex.test(number);
+    return result;
+}
 function find_related_parent_by_className(node, className) {
     let isFindParent = false;
     let parent = node;

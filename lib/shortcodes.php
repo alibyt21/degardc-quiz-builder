@@ -11,17 +11,20 @@ function degardc_quiz_builder_callback($atts)
     // $quiz_description = $quiz_data->description;
     // $quiz_questions = $quiz_data->questions;
     // $quiz_settings = $quiz_data->settings;
-    
+
+
 ?>
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/persian-datepicker.min.css' ?>" />
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/index.css' ?>" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/toastify.min.css' ?>" />
+    <script type="text/javascript" src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/toastify.min.js' ?>"></script>
 
 
     <div class="dg-main-container overflow-hidden relative flex flex-col justify-center items-center px-2 w-full h-screen my-6">
-        <div class="bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
+        <div class="hidden bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
             <div class="dg-progress-bar absolute right-0 bg-blue-500 h-2 rounded-xl transition-all duration-1000 ease-in-out" style="width: 0%;"></div>
         </div>
+        <!-- https://stackoverflow.com/questions/50649381/svg-arc-progress-bar-with-constant-stroke-dasharray-object -->
 
 
 
@@ -47,7 +50,6 @@ function degardc_quiz_builder_callback($atts)
         </div>
 
 
-        <!-- START questions -->
         <div class="sample-multiple-choice-question dg-step-card dg-question-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
             <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
                 <div class="text-gray-400">
@@ -77,21 +79,17 @@ function degardc_quiz_builder_callback($atts)
                 </button>
             </div>
         </div>
-        <!-- END questions -->
 
 
-        <div class="register-on-site dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
+        <div class="collect-mobile-number dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
             <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
                 <div class="text-center my-2">
                     <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
                         نتیجه آزمون به شماره شما ارسال خواهد شد
                     </h1>
                 </div>
-                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="tel" placeholder="نام و نام خانوادگی" />
-                </div>
                 <div class="flex flex-row w-full justify-between p-3 rounded-xl border my-2 border-solid border-gray-300">
-                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="tel" placeholder="شماره موبایل خود را وارد کنید" />
+                    <input class="flex-auto w-2/3 focus-visible:outline-none" id="mobile-number" pattern="[0]{1}[9]{1}[0-9]{9}" type="number" minlength="10" maxlength="11" placeholder="شماره موبایل خود را وارد کنید" />
                     <div class="flex flex-row items-center" id='flag'>
                         <div class="border-l mx-2"></div>
                         <span class="ml-2">98+</span>
@@ -104,38 +102,99 @@ function degardc_quiz_builder_callback($atts)
                 </div>
             </div>
             <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
-                <button class="dg-next-step-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
-                    تایید شماره
+                <button class="dg-next-step-button collect-mobile-number-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                    ارسال کد تایید
                 </button>
-                <button style="display: none;" class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
-                    بازگشت به آزمون
+                <button style="display: none;" class="dg-prev-step-button hover:bg-[#efefef] transition-all duration-300 ease-in-out border border-solid border-gray-300 cursor-pointer w-full rounded-xl p-3 ml-5">
+                    قبلی
                 </button>
             </div>
         </div>
 
-
-
-        <div class="mobile-number-validation dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
+        <div class="register-validate dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-start">
             <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
                 <div class="text-center my-2">
                     <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
-                        کد تایید ارسال شده را وارد کنید
+                        ثبت نام / ورود به سایت
                     </h1>
                 </div>
                 <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                    <input class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
+                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="email" placeholder="آدرس ایمیل" />
                 </div>
-
+                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="password" placeholder="پسورد" />
+                </div>
+                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                    <input id="validation-code" class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
+                </div>
+                <div class="flex justify-center text-sm text-gray-400 my-2">
+                    <div class="flex" id="dg-countdown-container">
+                        <div class="mx-2">دریافت مجدد کد تا</div>
+                        <div id="dg-countdown-timer">03:00</div>
+                    </div>
+                    <div id="dg-send-new-code" class="cursor-pointer text-blue-500">دریافت مجدد کد</div>
+                </div>
             </div>
             <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
-                <button class="dg-next-step-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
-                    ارسال نتیجه آزمون
+                <button class="dg-next-step-button register-validate-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                    ثبت نام / ورود
+                </button>
+                <button class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
+                    بازگشت و اصلاح شماره
+                </button>
+            </div>
+        </div>
+
+        <div class="only-register dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
+            <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
+                <div class="text-center my-2">
+                    <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
+                        ثبت نام / ورود به سایت
+                    </h1>
+                </div>
+                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="email" placeholder="آدرس ایمیل" />
+                </div>
+                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                    <input class="flex-auto w-2/3 focus-visible:outline-none" type="password" placeholder="پسورد" />
+                </div>
+            </div>
+            <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
+                <button class="dg-next-step-button only-register-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                    ثبت نام / ورود
+                </button>
+            </div>
+        </div>
+
+        <div class="only-validate dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
+            <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
+                <div class="text-center my-2">
+                    <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
+                        تایید شماره
+                    </h1>
+                </div>
+                <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                    <input id="validation-code" class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
+                </div>
+                <div class="flex justify-center text-sm text-gray-400 my-2">
+                    <div class="flex" id="dg-countdown-container">
+                        <div class="mx-2">دریافت مجدد کد تا</div>
+                        <div id="dg-countdown-timer">03:00</div>
+                    </div>
+                    <div id="dg-send-new-code" class="cursor-pointer text-blue-500">دریافت مجدد کد</div>
+                </div>
+            </div>
+            <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
+                <button class="dg-next-step-button only-validate-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                    تایید شماره
                 </button>
                 <button class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
                     اصلاح شماره
                 </button>
             </div>
         </div>
+
+
 
         <div class="book-an-appointment flex justify-center dg-question-card dg-after-exam-question dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out items-center">
             <div class="dg-step-block p-5 md:p-7 lg:p-10">
@@ -175,9 +234,70 @@ function degardc_quiz_builder_callback($atts)
         </div>
 
 
-        <div class="result flex justify-center dg-step-card absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out items-center">
+        <div class="result flex flex-col justify-center dg-step-card static top-12 left-2 right-2 rounded-xl w-full max-w-[600px] transition-all ease-in-out items-center">
+            <div class="dg-total-result flex flex-col w-full justify-center bg-white rounded-xl pb-8 px-4 mb-3">
+                <div id="progress">
+                    <svg viewbox="0 0 110 100" style="width: 200px;height:180px">
+                        <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="100%">
+                            <stop offset="0%" stop-color="#56c4fb" />
+                            <stop offset="100%" stop-color="#0baeff" />
+                        </linearGradient>
+                        <path class="grey" d="M30,90 A40,40 0 1,1 80,90" fill='none' />
+                        <path id="percentage-curve" fill='none' class="blue" d="M30,90 A40,40 0 1,1 80,90" />
+
+                        <text id="percentage-text" x="41%" y="52%" dominant-baseline="middle" text-anchor="middle" style="font-size:20px;">12</text>
+                        <text x="50%" y="71%" dominant-baseline="middle" text-anchor="middle" style="font-size:10px;fill:#aaaaaa;">نمره نهایی</text>
+                        <text x="63%" y="53%" dominant-baseline="middle" text-anchor="middle" style="font-size:10px;fill:#aaaaaa;">100/</text>
+                    </svg>
+                </div>
+                <div class="text-center text-xl my-2">
+                    تبریک!
+                </div>
+                <div class="text-gray-500 text-center">شما موفق شدید متن نمایشی ما را نمایش دهید</div>
+            </div>
+            <div class="dg-single-result flex flex-row items-center justify-between bg-white rounded-xl w-full p-4 px-6 my-2">
+                <div class="flex flex-col">
+                    <div class="dg-single-result-name text-gray-600"></div>
+                    <div class="dg-single-result-description text-sm text-gray-400"></div>
+                </div>
+                <div class="z-[2]">
+                    <div class="dg-single-result-score rating"></div>
+                </div>
+            </div>
             
-            salam
+            <div class="dg-ticket w-full my-2 hidden">
+                <div class="container">
+                    <div class="bp-card" data-clickthrough="link">
+                        <div class="bp-card_label">
+                            <div class="bd-border_solid"></div>
+                            <div class="bd-border_dotted"></div>
+                        </div>
+                        <div class="bp-card_content">
+                            <p class="secondary">Medium ticket</p>
+                            <h4>Ticket name</h4>
+
+
+                            <ul>
+                                <span>Including:</span>
+                                <li>
+                                    Minimal 1
+                                </li>
+                                <li>
+                                    Minimal 1
+                                </li>
+                                <li>
+                                    Minimal 1
+                                </li>
+                            </ul>
+
+                            <a href="" class="price">
+                                € 9,-
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
@@ -188,7 +308,6 @@ function degardc_quiz_builder_callback($atts)
     <script src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/jquery-3.6.4.min.js' ?>"></script>
     <script src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/persian-date.min.js' ?>"></script>
     <script src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/persian-datepicker.min.js' ?>"></script>
-    <script src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/index.js' ?>"></script>
 
 
 
