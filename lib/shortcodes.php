@@ -20,13 +20,13 @@ function degardc_quiz_builder_callback($atts)
     <script type="text/javascript" src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/toastify.min.js' ?>"></script>
 
 
+    <div class=" bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
+        <div class="dg-progress-bar absolute right-0 bg-blue-500 h-2 rounded-xl transition-all duration-1000 ease-in-out" style="width: 0%;"></div>
+    </div>
+    <!-- https://stackoverflow.com/questions/50649381/svg-arc-progress-bar-with-constant-stroke-dasharray-object -->
+    
+    
     <div class="dg-main-container overflow-hidden relative flex flex-col justify-center items-center px-2 w-full h-screen my-6">
-        <div class="hidden bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
-            <div class="dg-progress-bar absolute right-0 bg-blue-500 h-2 rounded-xl transition-all duration-1000 ease-in-out" style="width: 0%;"></div>
-        </div>
-        <!-- https://stackoverflow.com/questions/50649381/svg-arc-progress-bar-with-constant-stroke-dasharray-object -->
-
-
 
         <div class="dg-step-card dg-entrance-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
             <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
@@ -264,7 +264,7 @@ function degardc_quiz_builder_callback($atts)
                     <div class="dg-single-result-score rating"></div>
                 </div>
             </div>
-            
+
             <div class="dg-ticket w-full my-2 hidden">
                 <div class="container">
                     <div class="bp-card" data-clickthrough="link">

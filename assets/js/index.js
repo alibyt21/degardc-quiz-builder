@@ -5,11 +5,12 @@ let quizData = {
     settings: {
         requireScore: 56,
         collectMobileNumber: true,
-        validateMobileNumber: true,
+        validateMobileNumber: false,
         registerOnSite: false,
         seprateResult: true,
         showResult: true,
-        bookAnAppointment: true,
+        bookAnAppointment: false,
+        oneAttempt: true,
     },
     questions: [
         {
@@ -134,6 +135,11 @@ let quizData = {
     ],
 };
 
+
+
+
+
+
 // make a copy of parts of html source
 let clonedMultipleChoiceAnswer = document
     .querySelector(".sample-multiple-choice-answer")
@@ -178,6 +184,15 @@ document.querySelector(".dg-single-result").remove();
 let clonedResult = document.querySelector(".result").cloneNode(true);
 document.querySelector(".result").remove();
 
+
+let quizResult = JSON.parse(localStorage.getItem("quizResult")) || {
+    groupResult: {},
+    totalScore: "",
+    isFinished: false,
+};
+console.log(quizResult);
+
+
 function create_multiple_choice_answer(singleAnswer) {
     let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
     newAnswer.querySelector(".answer-name").innerHTML = singleAnswer.name;
@@ -212,46 +227,47 @@ function change_question_if_last_or_first(quizData, newQuestion, index) {
 }
 function create_quiz(quizData) {
     let mainParent = document.querySelector(".dg-main-container");
-    //name and description
-    document.querySelector(".quiz-name").innerHTML = quizData.name;
-    document.querySelector(".quiz-description").innerHTML =
-        quizData.description;
-
-    //questions
-    append_all_questions_into_html(quizData, mainParent);
-
-    //collect mobile number
-    if (quizData.settings.collectMobileNumber) {
-        mainParent.appendChild(clonedCollectMobileNumber);
+    if(!quizResult.isFinished || !quizData.settings.oneAttempt){
+        //name and description
+        document.querySelector(".quiz-name").innerHTML = quizData.name;
+        document.querySelector(".quiz-description").innerHTML =
+            quizData.description;
+    
+        //questions
+        append_all_questions_into_html(quizData, mainParent);
+    
+        //collect mobile number
+        if (quizData.settings.collectMobileNumber) {
+            mainParent.appendChild(clonedCollectMobileNumber);
+        }
+        if (
+            quizData.settings.collectMobileNumber &&
+            quizData.settings.validateMobileNumber &&
+            quizData.settings.registerOnSite
+        ) {
+            //register-validate
+            mainParent.appendChild(clonedRegisterValidate);
+        } else if (
+            quizData.settings.collectMobileNumber &&
+            quizData.settings.validateMobileNumber &&
+            !quizData.settings.registerOnSite
+        ) {
+            //only-validate
+            mainParent.appendChild(clonedOnlyValidate);
+        } else if (
+            (!quizData.settings.collectMobileNumber ||
+                !quizData.settings.validateMobileNumber) &&
+            quizData.settings.registerOnSite
+        ) {
+            //only-register
+            mainParent.appendChild(clonedOnlyRegister);
+        }
+    
+        //book an appointment
+        if (quizData.settings.bookAnAppointment) {
+            mainParent.appendChild(clonedBookAnAppointment);
+        }
     }
-    if (
-        quizData.settings.collectMobileNumber &&
-        quizData.settings.validateMobileNumber &&
-        quizData.settings.registerOnSite
-    ) {
-        //register-validate
-        mainParent.appendChild(clonedRegisterValidate);
-    } else if (
-        quizData.settings.collectMobileNumber &&
-        quizData.settings.validateMobileNumber &&
-        !quizData.settings.registerOnSite
-    ) {
-        //only-validate
-        mainParent.appendChild(clonedOnlyValidate);
-    } else if (
-        (!quizData.settings.collectMobileNumber ||
-            !quizData.settings.validateMobileNumber) &&
-        quizData.settings.registerOnSite
-    ) {
-        //only-register
-        mainParent.appendChild(clonedOnlyRegister);
-    }
-
-    //book an appointment
-    if (quizData.settings.bookAnAppointment) {
-        mainParent.appendChild(clonedBookAnAppointment);
-    }
-
     //show result
     mainParent.appendChild(clonedResult);
 }
@@ -281,14 +297,11 @@ const QUESTION_TYPES = {
     type2: "multi-option",
 };
 let stepBlocks = document.querySelectorAll(".dg-step-block");
-let clonedStartStepBlock = stepBlocks[0].cloneNode(true);
-let clonedFirstQuestionBlock = stepBlocks[1].cloneNode(true);
 let startExamButton = document.querySelector(".dg-start-exam-button");
 let progressBar = document.querySelector(".dg-progress-bar");
 let progressBarContainer = document.getElementById("dg-progress-bar-container");
 let questionCards = document.querySelectorAll(".dg-question-card");
 let stepCards = document.querySelectorAll(".dg-step-card");
-
 let animationDuration = 500;
 let entranceAnimationDuration = 1000;
 let currentIndex = 1;
@@ -485,24 +498,151 @@ function start_exam_button_animations() {
     window.removeEventListener("resize", set_start_exam_button_position);
 }
 
+
+function limit_to_result_page(){
+    let mainParent = document.querySelector(".dg-main-container");
+    mainParent.innerHTML = "";
+    mainParent.appendChild(clonedResult);
+    create_result();
+}
+
+
+function create_result() {
+    // set quiz to finished
+    if(quizData.settings.oneAttempt){
+        quizResult.isFinished = true;
+    }
+    //save results
+    localStorage.setItem("quizResult",JSON.stringify(quizResult));
+    init_total_score();
+    if (quizData.settings.seprateResult) {
+        for (const groupId in quizResult.groupResult) {
+            let newElem = clonedSingleResult.cloneNode(true);
+            let groupData = get_quiz_sub_data_by_quiz_group(
+                quizData,
+                groupId
+            );
+            newElem.querySelector(".dg-single-result-name").innerHTML =
+                groupData.name;
+            newElem.querySelector(
+                ".dg-single-result-description"
+            ).innerHTML = groupData.description;
+            newElem.querySelector(".dg-single-result-score").innerHTML =
+                quizResult.groupResult[groupId].score + "%";
+            clonedResult.appendChild(newElem);
+        }
+        init_ratings();
+    }
+}
+function init_total_score() {
+    let totalScore = parseInt(quizResult.totalScore).toFixed(0);
+    let percentageCurve = document.getElementById("percentage-curve");
+    let percentageText = document.getElementById("percentage-text");
+    percentageText.textContent = totalScore.toString();
+    var progress = 1 - totalScore / 100;
+    percentageCurve.style.strokeDashoffset = 198 * progress;
+}
+function init_ratings() {
+    /*
+    Conic gradients are not supported in all browsers (https://caniuse.com/#feat=css-conic-gradients), so this pen includes the CSS conic-gradient() polyfill by Lea Verou (https://leaverou.github.io/conic-gradient/)
+    */
+
+    // Find al rating items
+    const ratings = document.querySelectorAll(".rating");
+
+    // Iterate over all rating items
+    ratings.forEach((rating) => {
+        // Get content and get score as an int
+        const ratingContent = rating.innerHTML;
+        const ratingScore = parseInt(ratingContent, 10);
+
+        // Define if the score is good, meh or bad according to its value
+        const scoreClass =
+            ratingScore < 40 ? "bad" : ratingScore < 60 ? "meh" : "good";
+
+        // Add score class to the rating
+        rating.classList.add(scoreClass);
+
+        // After adding the class, get its color
+        const ratingColor = window.getComputedStyle(rating).backgroundColor;
+
+        // Define the background gradient according to the score and color
+        const gradient = `background: conic-gradient(${ratingColor} ${ratingScore}%, transparent 0 100%)`;
+
+        // Set the gradient as the rating background
+        rating.setAttribute("style", gradient);
+
+        // Wrap the content in a tag to show it above the pseudo element that masks the bar
+        rating.innerHTML = `<span>${ratingScore} ${
+            ratingContent.indexOf("%") >= 0 ? "<small>%</small>" : ""
+        }</span>`;
+    });
+}
+if(quizResult.isFinished && quizData.settings.oneAttempt){
+    limit_to_result_page();
+}
+function get_quiz_sub_data_by_quiz_group(quizData, group) {
+    if (quizData.group == group) {
+        return quizData;
+    } else {
+        if (quizData.childs) {
+            for (let index = 0; index < quizData.childs.length; index++) {
+                if (
+                    get_quiz_sub_data_by_quiz_group(
+                        quizData.childs[index],
+                        group
+                    )
+                ) {
+                    return get_quiz_sub_data_by_quiz_group(
+                        quizData.childs[index],
+                        group
+                    );
+                }
+            }
+        } else {
+            return false;
+        }
+    }
+}
+function update_quiz_result(group, score, questionCount) {
+    let sum = 0;
+    let questionCountTotal = 0;
+    if (!quizResult.groupResult[group]) {
+        //insert
+        quizResult.groupResult[group] = {};
+    }
+    quizResult.groupResult[group].score = score;
+    quizResult.groupResult[group].questionCount = questionCount;
+    for (const key in quizResult.groupResult) {
+        sum =
+            sum +
+            quizResult.groupResult[key].score *
+                quizResult.groupResult[key].questionCount;
+        questionCountTotal =
+            questionCountTotal + quizResult.groupResult[key].questionCount;
+    }
+    quizResult.totalScore = sum / questionCountTotal;
+    // we can add weight to every single quiz group and make weighted average
+}
+
+
+
+
+
+
+
 function exam_is_ready_to_start() {
     let progressBar = document.querySelector(".dg-progress-bar");
     let participantData = [];
     let currentIndex = 1;
     let nextStepButton = document.querySelectorAll(".dg-next-step-button");
     let prevStepButton = document.querySelectorAll(".dg-prev-step-button");
-    let nextQuestionButton = document.querySelectorAll(
-        ".dg-next-question-button"
-    );
     let allOptions = document.querySelectorAll(".option");
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
     let sendNewCode = document.getElementById("dg-send-new-code");
 
-    let quizResult = {
-        groupResult: {},
-        totalScore: "",
-    };
+   
     let insertedId = -1;
     let interval;
 
@@ -588,15 +728,15 @@ function exam_is_ready_to_start() {
                 // only validate API
                 let mobileNumber =
                     document.getElementById("mobile-number").value;
-                let validationCode = document.getElementById("validation-code").value;
+                let validationCode =
+                    document.getElementById("validation-code").value;
                 try {
                     await handle_request_to_check_validation_code(
                         validationCode,
                         mobileNumber
                     );
                     go_to_next_step_animations(index);
-                } catch (error) {
-                }
+                } catch (error) {}
             } else {
                 // default - for questions next buttons
                 go_to_next_step_animations(index);
@@ -1124,49 +1264,7 @@ function exam_is_ready_to_start() {
             }
         }
     }
-    function get_quiz_sub_data_by_quiz_group(quizData, group) {
-        if (quizData.group == group) {
-            return quizData;
-        } else {
-            if (quizData.childs) {
-                for (let index = 0; index < quizData.childs.length; index++) {
-                    if (
-                        get_quiz_sub_data_by_quiz_group(
-                            quizData.childs[index],
-                            group
-                        )
-                    ) {
-                        return get_quiz_sub_data_by_quiz_group(
-                            quizData.childs[index],
-                            group
-                        );
-                    }
-                }
-            } else {
-                return false;
-            }
-        }
-    }
-    function update_quiz_result(group, score, questionCount) {
-        let sum = 0;
-        let questionCountTotal = 0;
-        if (!quizResult.groupResult[group]) {
-            //insert
-            quizResult.groupResult[group] = {};
-        }
-        quizResult.groupResult[group].score = score;
-        quizResult.groupResult[group].questionCount = questionCount;
-        for (const key in quizResult.groupResult) {
-            sum =
-                sum +
-                quizResult.groupResult[key].score *
-                    quizResult.groupResult[key].questionCount;
-            questionCountTotal =
-                questionCountTotal + quizResult.groupResult[key].questionCount;
-        }
-        quizResult.totalScore = sum / questionCountTotal;
-        // we can add weight to every single quiz group and make weighted average
-    }
+    
     /* END quiz correction */
     function check_if_is_allow_to_participate_in_next_group(quizData, group) {
         let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
@@ -1197,72 +1295,6 @@ function exam_is_ready_to_start() {
                 stepCards[index].remove();
             }
         }
-    }
-
-    function create_result() {
-        init_total_score();
-        if (quizData.settings.seprateResult) {
-            for (const groupId in quizResult.groupResult) {
-                let newElem = clonedSingleResult.cloneNode(true);
-                let groupData = get_quiz_sub_data_by_quiz_group(
-                    quizData,
-                    groupId
-                );
-                newElem.querySelector(".dg-single-result-name").innerHTML =
-                    groupData.name;
-                newElem.querySelector(
-                    ".dg-single-result-description"
-                ).innerHTML = groupData.description;
-                newElem.querySelector(".dg-single-result-score").innerHTML =
-                    quizResult.groupResult[groupId].score + "%";
-                clonedResult.appendChild(newElem);
-            }
-            init_ratings();
-        }
-    }
-    function init_total_score() {
-        let totalScore = parseInt(quizResult.totalScore).toFixed(0);
-        let percentageCurve = document.getElementById("percentage-curve");
-        let percentageText = document.getElementById("percentage-text");
-        percentageText.textContent = totalScore.toString();
-        var progress = 1 - totalScore / 100;
-        percentageCurve.style.strokeDashoffset = 198 * progress;
-    }
-    function init_ratings() {
-        /*
-        Conic gradients are not supported in all browsers (https://caniuse.com/#feat=css-conic-gradients), so this pen includes the CSS conic-gradient() polyfill by Lea Verou (https://leaverou.github.io/conic-gradient/)
-        */
-
-        // Find al rating items
-        const ratings = document.querySelectorAll(".rating");
-
-        // Iterate over all rating items
-        ratings.forEach((rating) => {
-            // Get content and get score as an int
-            const ratingContent = rating.innerHTML;
-            const ratingScore = parseInt(ratingContent, 10);
-
-            // Define if the score is good, meh or bad according to its value
-            const scoreClass =
-                ratingScore < 40 ? "bad" : ratingScore < 60 ? "meh" : "good";
-
-            // Add score class to the rating
-            rating.classList.add(scoreClass);
-
-            // After adding the class, get its color
-            const ratingColor = window.getComputedStyle(rating).backgroundColor;
-
-            // Define the background gradient according to the score and color
-            const gradient = `background: conic-gradient(${ratingColor} ${ratingScore}%, transparent 0 100%)`;
-
-            // Set the gradient as the rating background
-            rating.setAttribute("style", gradient);
-
-            // Wrap the content in a tag to show it above the pseudo element that masks the bar
-            rating.innerHTML = `<span>${ratingScore} ${
-                ratingContent.indexOf("%") >= 0 ? "<small>%</small>" : ""
-            }</span>`;
-        });
     }
 
     setInterval(function () {
