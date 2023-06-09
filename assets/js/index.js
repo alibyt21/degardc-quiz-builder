@@ -1,16 +1,21 @@
+// constants
+const QUESTION_TYPES = {
+    type1: "single-option",
+    type2: "multi-option",
+};
 let quizData = {
     group: 1,
     name: "اولین آزمون زبان انگلیسی",
     description: "یسری توضیحات",
     settings: {
-        requireScore: 56,
+        requireScore: 0,
         collectMobileNumber: true,
         validateMobileNumber: false,
         registerOnSite: false,
         seprateResult: true,
         showResult: true,
-        bookAnAppointment: false,
-        oneAttempt: true,
+        bookAnAppointment: true,
+        oneAttempt: false,
     },
     questions: [
         {
@@ -135,63 +140,41 @@ let quizData = {
     ],
 };
 
+// variables
+let quizResult;
+let clonedMultipleChoiceAnswer,
+    clonedMultipleChoiceQuestion,
+    clonedCollectMobileNumber,
+    clonedRegisterValidate,
+    clonedOnlyValidate,
+    clonedOnlyRegister,
+    clonedBookAnAppointment,
+    clonedSingleResult,
+    clonedResult;
+let stepBlocks,
+    startExamButton,
+    progressBar,
+    progressBarContainer,
+    questionCards,
+    stepCards;
+const animationDuration = 500;
+const entranceAnimationDuration = 1000;
+let currentIndex = 1;
 
+// before exam functions needs to run
+make_copy_of_html_parts();
+get_prev_quiz_result_if_exists();
 
+create_quiz(quizData);
 
+// show result page instead of new exam as a result of oneAttempt is actived
+if (quizResult.isFinished && quizData.settings.oneAttempt) {
+    limit_to_result_page();
+}
 
-
-// make a copy of parts of html source
-let clonedMultipleChoiceAnswer = document
-    .querySelector(".sample-multiple-choice-answer")
-    .cloneNode(true);
-document.querySelector(".sample-multiple-choice-answer").remove();
-
-let clonedMultipleChoiceQuestion = document
-    .querySelector(".sample-multiple-choice-question")
-    .cloneNode(true);
-document.querySelector(".sample-multiple-choice-question").remove();
-
-let clonedCollectMobileNumber = document
-    .querySelector(".collect-mobile-number")
-    .cloneNode(true);
-document.querySelector(".collect-mobile-number").remove();
-
-let clonedRegisterValidate = document
-    .querySelector(".register-validate")
-    .cloneNode(true);
-document.querySelector(".register-validate").remove();
-
-let clonedOnlyValidate = document
-    .querySelector(".only-validate")
-    .cloneNode(true);
-document.querySelector(".only-validate").remove();
-
-let clonedOnlyRegister = document
-    .querySelector(".only-register")
-    .cloneNode(true);
-document.querySelector(".only-register").remove();
-
-let clonedBookAnAppointment = document
-    .querySelector(".book-an-appointment")
-    .cloneNode(true);
-//remove orginals from html
-document.querySelector(".book-an-appointment").remove();
-
-let clonedSingleResult = document
-    .querySelector(".dg-single-result")
-    .cloneNode(true);
-document.querySelector(".dg-single-result").remove();
-let clonedResult = document.querySelector(".result").cloneNode(true);
-document.querySelector(".result").remove();
-
-
-let quizResult = JSON.parse(localStorage.getItem("quizResult")) || {
-    groupResult: {},
-    totalScore: "",
-    isFinished: false,
-};
-console.log(quizResult);
-
+// public events
+window.addEventListener("resize", set_start_exam_button_position);
+startExamButton.addEventListener("click", start_exam_button_animations);
 
 function create_multiple_choice_answer(singleAnswer) {
     let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
@@ -227,15 +210,15 @@ function change_question_if_last_or_first(quizData, newQuestion, index) {
 }
 function create_quiz(quizData) {
     let mainParent = document.querySelector(".dg-main-container");
-    if(!quizResult.isFinished || !quizData.settings.oneAttempt){
+    if (!quizResult.isFinished || !quizData.settings.oneAttempt) {
         //name and description
         document.querySelector(".quiz-name").innerHTML = quizData.name;
         document.querySelector(".quiz-description").innerHTML =
             quizData.description;
-    
+
         //questions
         append_all_questions_into_html(quizData, mainParent);
-    
+
         //collect mobile number
         if (quizData.settings.collectMobileNumber) {
             mainParent.appendChild(clonedCollectMobileNumber);
@@ -262,14 +245,20 @@ function create_quiz(quizData) {
             //only-register
             mainParent.appendChild(clonedOnlyRegister);
         }
-    
+
+        //show result
+        mainParent.appendChild(clonedResult);
+
         //book an appointment
         if (quizData.settings.bookAnAppointment) {
             mainParent.appendChild(clonedBookAnAppointment);
         }
+    } else {
+        //show result
+        mainParent.appendChild(clonedResult);
     }
-    //show result
-    mainParent.appendChild(clonedResult);
+    // init before exam start
+    init_before_exam_start();
 }
 function append_all_questions_into_html(quizData, parentNode) {
     if (quizData.questions) {
@@ -290,24 +279,14 @@ function append_all_questions_into_html(quizData, parentNode) {
         });
     }
 }
-create_quiz(quizData);
 
-const QUESTION_TYPES = {
-    type1: "single-option",
-    type2: "multi-option",
-};
-let stepBlocks = document.querySelectorAll(".dg-step-block");
-let startExamButton = document.querySelector(".dg-start-exam-button");
-let progressBar = document.querySelector(".dg-progress-bar");
-let progressBarContainer = document.getElementById("dg-progress-bar-container");
-let questionCards = document.querySelectorAll(".dg-question-card");
-let stepCards = document.querySelectorAll(".dg-step-card");
-let animationDuration = 500;
-let entranceAnimationDuration = 1000;
-let currentIndex = 1;
-
-init_before_exam_start();
 function init_before_exam_start() {
+    stepBlocks = document.querySelectorAll(".dg-step-block");
+    startExamButton = document.querySelector(".dg-start-exam-button");
+    progressBar = document.querySelector(".dg-progress-bar");
+    progressBarContainer = document.getElementById("dg-progress-bar-container");
+    questionCards = document.querySelectorAll(".dg-question-card");
+    stepCards = document.querySelectorAll(".dg-step-card");
     set_start_exam_button_position();
     set_z_index_for_all_steps_and_make_them_3d();
     set_transition_duration_before_exam_start();
@@ -408,7 +387,6 @@ function init_before_exam_start() {
         responsive: true,
     });
 }
-window.addEventListener("resize", set_start_exam_button_position);
 
 function set_questions_opacity_to_zero_and_qnumber() {
     for (let index = 0; index < questionCards.length; index++) {
@@ -446,7 +424,6 @@ function set_z_index_for_all_steps_and_make_them_3d() {
     }
 }
 
-startExamButton.addEventListener("click", start_exam_button_animations);
 function start_exam_button_animations() {
     stepBlocks[0].parentNode.classList.add("dg-question-card");
     // animate first step block
@@ -498,38 +475,34 @@ function start_exam_button_animations() {
     window.removeEventListener("resize", set_start_exam_button_position);
 }
 
-
-function limit_to_result_page(){
+function limit_to_result_page() {
     let mainParent = document.querySelector(".dg-main-container");
     mainParent.innerHTML = "";
     mainParent.appendChild(clonedResult);
     create_result();
 }
 
-
 function create_result() {
     // set quiz to finished
-    if(quizData.settings.oneAttempt){
+    if (quizData.settings.oneAttempt) {
         quizResult.isFinished = true;
     }
     //save results
-    localStorage.setItem("quizResult",JSON.stringify(quizResult));
+    localStorage.setItem("quizResult", JSON.stringify(quizResult));
     init_total_score();
     if (quizData.settings.seprateResult) {
         for (const groupId in quizResult.groupResult) {
             let newElem = clonedSingleResult.cloneNode(true);
-            let groupData = get_quiz_sub_data_by_quiz_group(
-                quizData,
-                groupId
-            );
+            let groupData = get_quiz_sub_data_by_quiz_group(quizData, groupId);
             newElem.querySelector(".dg-single-result-name").innerHTML =
                 groupData.name;
-            newElem.querySelector(
-                ".dg-single-result-description"
-            ).innerHTML = groupData.description;
+            newElem.querySelector(".dg-single-result-description").innerHTML =
+                groupData.description;
             newElem.querySelector(".dg-single-result-score").innerHTML =
                 quizResult.groupResult[groupId].score + "%";
-            clonedResult.appendChild(newElem);
+            clonedResult
+                .querySelector(".dg-seprate-results")
+                .appendChild(newElem);
         }
         init_ratings();
     }
@@ -578,9 +551,7 @@ function init_ratings() {
         }</span>`;
     });
 }
-if(quizResult.isFinished && quizData.settings.oneAttempt){
-    limit_to_result_page();
-}
+
 function get_quiz_sub_data_by_quiz_group(quizData, group) {
     if (quizData.group == group) {
         return quizData;
@@ -625,12 +596,6 @@ function update_quiz_result(group, score, questionCount) {
     // we can add weight to every single quiz group and make weighted average
 }
 
-
-
-
-
-
-
 function exam_is_ready_to_start() {
     let progressBar = document.querySelector(".dg-progress-bar");
     let participantData = [];
@@ -642,7 +607,6 @@ function exam_is_ready_to_start() {
     let questionCards = document.querySelectorAll(".dg-question-card");
     let sendNewCode = document.getElementById("dg-send-new-code");
 
-   
     let insertedId = -1;
     let interval;
 
@@ -1264,7 +1228,7 @@ function exam_is_ready_to_start() {
             }
         }
     }
-    
+
     /* END quiz correction */
     function check_if_is_allow_to_participate_in_next_group(quizData, group) {
         let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
@@ -1298,7 +1262,7 @@ function exam_is_ready_to_start() {
     }
 
     setInterval(function () {
-        console.log(quizResult);
+        console.log(participantData);
     }, 2000);
 }
 
@@ -1410,3 +1374,57 @@ function find_related_parent_by_className(node, className) {
     }
 }
 /* END helper functions */
+
+function make_copy_of_html_parts() {
+    // make a copy of parts of html source
+    clonedMultipleChoiceAnswer = document
+        .querySelector(".sample-multiple-choice-answer")
+        .cloneNode(true);
+    document.querySelector(".sample-multiple-choice-answer").remove();
+
+    clonedMultipleChoiceQuestion = document
+        .querySelector(".sample-multiple-choice-question")
+        .cloneNode(true);
+    document.querySelector(".sample-multiple-choice-question").remove();
+
+    clonedCollectMobileNumber = document
+        .querySelector(".collect-mobile-number")
+        .cloneNode(true);
+    document.querySelector(".collect-mobile-number").remove();
+
+    clonedRegisterValidate = document
+        .querySelector(".register-validate")
+        .cloneNode(true);
+    document.querySelector(".register-validate").remove();
+
+    clonedOnlyValidate = document
+        .querySelector(".only-validate")
+        .cloneNode(true);
+    document.querySelector(".only-validate").remove();
+
+    clonedOnlyRegister = document
+        .querySelector(".only-register")
+        .cloneNode(true);
+    document.querySelector(".only-register").remove();
+
+    clonedBookAnAppointment = document
+        .querySelector(".book-an-appointment")
+        .cloneNode(true);
+    document.querySelector(".book-an-appointment").remove();
+
+    clonedSingleResult = document
+        .querySelector(".dg-single-result")
+        .cloneNode(true);
+    document.querySelector(".dg-single-result").remove();
+
+    clonedResult = document.querySelector(".result").cloneNode(true);
+    document.querySelector(".result").remove();
+}
+
+function get_prev_quiz_result_if_exists() {
+    quizResult = JSON.parse(localStorage.getItem("quizResult")) || {
+        groupResult: {},
+        totalScore: "",
+        isFinished: false,
+    };
+}

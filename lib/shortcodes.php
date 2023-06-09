@@ -20,12 +20,12 @@ function degardc_quiz_builder_callback($atts)
     <script type="text/javascript" src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/toastify.min.js' ?>"></script>
 
 
-    <div class=" bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
+    <div class="hidden bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
         <div class="dg-progress-bar absolute right-0 bg-blue-500 h-2 rounded-xl transition-all duration-1000 ease-in-out" style="width: 0%;"></div>
     </div>
     <!-- https://stackoverflow.com/questions/50649381/svg-arc-progress-bar-with-constant-stroke-dasharray-object -->
-    
-    
+
+
     <div class="dg-main-container overflow-hidden relative flex flex-col justify-center items-center px-2 w-full h-screen my-6">
 
         <div class="dg-step-card dg-entrance-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
@@ -234,7 +234,7 @@ function degardc_quiz_builder_callback($atts)
         </div>
 
 
-        <div class="result flex flex-col justify-center dg-step-card static top-12 left-2 right-2 rounded-xl w-full max-w-[600px] transition-all ease-in-out items-center">
+        <div class="result bg-white flex flex-col justify-center dg-step-card static top-12 left-2 right-2 rounded-xl w-full max-w-[600px] transition-all ease-in-out items-center">
             <div class="dg-total-result flex flex-col w-full justify-center bg-white rounded-xl pb-8 px-4 mb-3">
                 <div id="progress">
                     <svg viewbox="0 0 110 100" style="width: 200px;height:180px">
@@ -253,15 +253,17 @@ function degardc_quiz_builder_callback($atts)
                 <div class="text-center text-xl my-2">
                     تبریک!
                 </div>
-                <div class="text-gray-500 text-center">شما موفق شدید متن نمایشی ما را نمایش دهید</div>
+                <div class="text-gray-500 text-center">--------------------------</div>
             </div>
-            <div class="dg-single-result flex flex-row items-center justify-between bg-white rounded-xl w-full p-4 px-6 my-2">
-                <div class="flex flex-col">
-                    <div class="dg-single-result-name text-gray-600"></div>
-                    <div class="dg-single-result-description text-sm text-gray-400"></div>
-                </div>
-                <div class="z-[2]">
-                    <div class="dg-single-result-score rating"></div>
+            <div class="dg-seprate-results w-full">
+                <div class="dg-single-result flex flex-row items-center justify-between bg-white rounded-xl w-full p-4 px-6 my-2">
+                    <div class="flex flex-col">
+                        <div class="dg-single-result-name text-gray-600"></div>
+                        <div class="dg-single-result-description text-sm text-gray-400"></div>
+                    </div>
+                    <div class="z-[2]">
+                        <div class="dg-single-result-score rating"></div>
+                    </div>
                 </div>
             </div>
 
@@ -297,6 +299,14 @@ function degardc_quiz_builder_callback($atts)
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 rounded-b-xl left-0 right-0 bottom-0 w-full max-w-[500px]">
+                <button class="dg-next-step-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                    رزرو تعیین سطح شفاهی
+                </button>
+                <button class="hidden dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3">
+
+                </button>
             </div>
         </div>
 
