@@ -3,141 +3,59 @@ const QUESTION_TYPES = {
     type1: "single-option",
     type2: "multi-option",
 };
+const loaderHTML = '<div class="loading-circle"></div>';
 let quizData = {
     group: 1,
     name: "اولین آزمون زبان انگلیسی",
     description: "یسری توضیحات",
     settings: {
-        requireScore: 0,
+        requireScore: 70,
+        collectParticipantName: true,
         collectMobileNumber: true,
         validateMobileNumber: false,
-        registerOnSite: false,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
     },
+    resultMessage: [
+        {
+            min: 0,
+            max: 30,
+            message: "0-30",
+        },
+        {
+            min: 31,
+            max: 50,
+            message: "31-50",
+        },
+    ],
     questions: [
         {
             id: 1,
-            name: "سلام این سوال اوله",
+            name: "1-\t---, 2, 3, ---, ---",
             description: "",
             answers: [
-                {
-                    name: "جواب یک",
-                    priority: "",
-                    isCorrect: true,
-                },
-                {
-                    name: "جواب دو",
-                    priority: "",
-                    isCorrect: false,
-                },
-                {
-                    name: "جواب سه",
-                    priority: "",
-                    isCorrect: false,
-                },
+                { name: "1, 4 ,5", priority: "", isCorrect: true },
+                { name: "1 ,5 ,6", priority: "", isCorrect: false },
+                { name: "4, 5, 6", priority: "", isCorrect: false },
+                { name: "1, 3, 5", priority: "", isCorrect: false },
             ],
-            settings: {
-                type: "",
-                weight: "",
-            },
         },
         {
             id: 2,
-            name: "سلام این سوال اوله",
+            name: "2-\t---, two, three, four, five",
             description: "",
             answers: [
-                {
-                    name: "جواب یک",
-                    priority: "",
-                    isCorrect: true,
-                },
-                {
-                    name: "جواب دو",
-                    priority: "",
-                    isCorrect: false,
-                },
-                {
-                    name: "جواب سه",
-                    priority: "",
-                    isCorrect: false,
-                },
+                { name: "one", priority: "", isCorrect: true },
+                { name: "on", priority: "", isCorrect: false },
+                { name: "once", priority: "", isCorrect: false },
+                { name: "own", priority: "", isCorrect: false },
             ],
-            settings: {
-                type: "",
-                weight: "",
-            },
         },
     ],
-
-    childs: [
-        {
-            group: 15,
-            name: "یک نام تستی برای گروه 15",
-            description: "یکسری توضیحات تستی برای گروه 15",
-            questions: [
-                {
-                    id: 24,
-                    name: "گروه دوم یک",
-                    description: "",
-                    answers: [
-                        {
-                            name: "",
-                        },
-                        {
-                            name: "",
-                        },
-                    ],
-                    settings: {
-                        type: "",
-                        weight: "",
-                    },
-                },
-            ],
-            settings: {
-                requireScore: 69,
-                validateMobileNumber: true,
-                registerOnSite: true,
-                seprateResult: true,
-                bookAnAppointment: true,
-            },
-            childs: null,
-        },
-        {
-            group: 17,
-            name: "یک نام تستی برای گروه 17",
-            description: "یکسری توضیحات تستی برای گروه 15",
-            questions: [
-                {
-                    id: 24,
-                    name: "گروه هفدهم یک",
-                    description: "",
-                    answers: [
-                        {
-                            name: "",
-                        },
-                        {
-                            name: "",
-                        },
-                    ],
-                    settings: {
-                        type: "",
-                        weight: "",
-                    },
-                },
-            ],
-            settings: {
-                requireScore: 0,
-                validateMobileNumber: true,
-                registerOnSite: true,
-                seprateResult: true,
-                bookAnAppointment: true,
-            },
-            childs: null,
-        },
-    ],
+    childs: [],
 };
 
 // variables
@@ -162,6 +80,8 @@ const entranceAnimationDuration = 1000;
 let currentIndex = 1;
 
 // before exam functions needs to run
+
+check_current_user_info_and_change_quiz_data_if_needed();
 make_copy_of_html_parts();
 get_prev_quiz_result_if_exists();
 
@@ -257,8 +177,22 @@ function create_quiz(quizData) {
         //show result
         mainParent.appendChild(clonedResult);
     }
+    tag_button_before_result_page();
+
     // init before exam start
     init_before_exam_start();
+}
+function tag_button_before_result_page() {
+    const resultPage = document.querySelector(".result");
+    let index = Array.from(resultPage.parentElement.children).indexOf(
+        resultPage
+    );
+    resultPage.parentElement.children[index - 1]
+        .querySelector(".dg-next-step-button")
+        .classList.add("show_result");
+    resultPage.parentElement.children[index - 1].querySelector(
+        ".dg-next-step-button"
+    ).innerHTML = "مشاهده نتیجه";
 }
 function append_all_questions_into_html(quizData, parentNode) {
     if (quizData.questions) {
@@ -287,7 +221,6 @@ function init_before_exam_start() {
     progressBarContainer = document.getElementById("dg-progress-bar-container");
     questionCards = document.querySelectorAll(".dg-question-card");
     stepCards = document.querySelectorAll(".dg-step-card");
-    set_start_exam_button_position();
     set_z_index_for_all_steps_and_make_them_3d();
     set_transition_duration_before_exam_start();
     set_questions_opacity_to_zero_and_qnumber();
@@ -386,6 +319,10 @@ function init_before_exam_start() {
         },
         responsive: true,
     });
+
+    document.querySelector(".quiz").style.display = "flex";
+    set_start_exam_button_position();
+    document.querySelector(".loading").style.display = "none";
 }
 
 function set_questions_opacity_to_zero_and_qnumber() {
@@ -407,6 +344,7 @@ function set_transition_duration_before_exam_start() {
 }
 
 function set_start_exam_button_position() {
+    startExamButton.style.transitionDuration = "0s";
     startExamButton.parentNode.classList.remove("justify-center");
     startExamButton.parentNode.classList.add("justify-end");
     let s = stepBlocks[0].offsetWidth - startExamButton.offsetWidth;
@@ -483,14 +421,17 @@ function limit_to_result_page() {
 }
 
 function create_result() {
+    document.querySelector(".result").style.visibility = "visible";
     // set quiz to finished
     if (quizData.settings.oneAttempt) {
         quizResult.isFinished = true;
     }
     //save results
     localStorage.setItem("quizResult", JSON.stringify(quizResult));
-    init_total_score();
+    let totalScore = parseInt(quizResult.totalScore).toFixed(0);
+    init_total_score(totalScore);
     if (quizData.settings.seprateResult) {
+        clonedResult.querySelector(".dg-seprate-results").innerHTML = "";
         for (const groupId in quizResult.groupResult) {
             let newElem = clonedSingleResult.cloneNode(true);
             let groupData = get_quiz_sub_data_by_quiz_group(quizData, groupId);
@@ -506,9 +447,17 @@ function create_result() {
         }
         init_ratings();
     }
+    make_result_message(totalScore);
 }
-function init_total_score() {
-    let totalScore = parseInt(quizResult.totalScore).toFixed(0);
+function make_result_message(totalScore) {
+    quizData.resultMessage.forEach(function (single) {
+        if (totalScore >= single.min && totalScore <= single.max) {
+            document.querySelector(".result-message").innerHTML =
+                single.message || "";
+        }
+    });
+}
+function init_total_score(totalScore) {
     let percentageCurve = document.getElementById("percentage-curve");
     let percentageText = document.getElementById("percentage-text");
     percentageText.textContent = totalScore.toString();
@@ -620,6 +569,9 @@ function exam_is_ready_to_start() {
     /* every thing happend here */
     nextStepButton.forEach(function (singleNextButton, index) {
         singleNextButton.addEventListener("click", async function (e) {
+            if (singleNextButton.classList.contains("show_result")) {
+                create_result();
+            }
             if (check_if_is_it_last_question_in_group(e.target)) {
                 let group = find_quiz_group_from_next_button(e.target);
                 let result = emendate_participant_data_with_single_quiz_data(
@@ -637,7 +589,6 @@ function exam_is_ready_to_start() {
                     remove_extra_questions(e.target);
                     go_to_next_step_animations(index);
                     handle_request_to_submit_answers();
-                    create_result();
                 } else {
                     go_to_next_step_animations(index);
                 }
@@ -685,7 +636,26 @@ function exam_is_ready_to_start() {
                 singleNextButton.classList.contains("only-register-button")
             ) {
                 // only register API
-                console.log("only-register");
+                let email = document.getElementById("participant-email").value;
+                let password = document.getElementById(
+                    "participant-password"
+                ).value;
+                let inputs = document
+                    .querySelector(".only-register")
+                    .querySelectorAll("input");
+                if (check_inputs(inputs)) {
+                    let buttonText = singleNextButton.innerHTML;
+                    singleNextButton.innerHTML = loaderHTML;
+                    try {
+                        await handle_request_to_register_login_user(
+                            email,
+                            password
+                        );
+                        go_to_next_step_animations(index);
+                    } catch (error) {
+                        singleNextButton.innerHTML = buttonText;
+                    }
+                }
             } else if (
                 singleNextButton.classList.contains("only-validate-button")
             ) {
@@ -821,6 +791,25 @@ function exam_is_ready_to_start() {
             }
         }
     }
+
+    async function handle_request_to_register_login_user(email, password) {
+        // send request to register_login user
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_login_if_exists_register_if_new",
+                email,
+                password,
+            });
+            if (response.error) {
+                show_notif(response.message, "error");
+                throw new Error();
+            } else {
+                show_notif(response.message, "success");
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
     async function request_to_api(
         data = {
             action: "",
@@ -912,7 +901,12 @@ function exam_is_ready_to_start() {
         if (!stepCards[+(index + 2)]) {
             return;
         }
-        if (stepCards[+(index + 2)].classList.contains("dg-question-card")) {
+        if (
+            stepCards[+(index + 2)].classList.contains("dg-question-card") &&
+            !stepCards[+(index + 2)].classList.contains(
+                "dg-after-exam-question"
+            )
+        ) {
             stepCards[+(index + 2)].style.transform =
                 "matrix(0.95, 0, 0 , 0.95 , 0 , 28)";
             stepCards[+(index + 2)].style.opacity = "50%";
@@ -925,7 +919,12 @@ function exam_is_ready_to_start() {
         if (!stepCards[+(index + 3)]) {
             return;
         }
-        if (stepCards[+(index + 3)].classList.contains("dg-question-card")) {
+        if (
+            stepCards[+(index + 3)].classList.contains("dg-question-card") &&
+            !stepCards[+(index + 3)].classList.contains(
+                "dg-after-exam-question"
+            )
+        ) {
             stepCards[+(index + 3)].style.transform =
                 "matrix(0.90, 0, 0 , 0.90 , 0 , 52)";
             stepCards[+(index + 3)].style.opacity = "25%";
@@ -947,7 +946,10 @@ function exam_is_ready_to_start() {
         progressBar.style.width = progressBarPercentage + "%";
 
         // current question animation
-        if (stepCards[index].classList.contains("dg-question-card")) {
+        if (
+            stepCards[index].classList.contains("dg-question-card") &&
+            !stepCards[index].classList.contains("dg-after-exam-question")
+        ) {
             stepCards[index].style.transform =
                 "matrix(0.95, 0, 0 , 0.95 , 0 , 28)";
             stepCards[index].style.opacity = "50%";
@@ -964,7 +966,12 @@ function exam_is_ready_to_start() {
         if (!stepCards[+(index + 1)]) {
             return;
         }
-        if (stepCards[+(index + 1)].classList.contains("dg-question-card")) {
+        if (
+            stepCards[+(index + 1)].classList.contains("dg-question-card") &&
+            !stepCards[+(index + 1)].classList.contains(
+                "dg-after-exam-question"
+            )
+        ) {
             stepCards[+(index + 1)].style.transform =
                 "matrix(0.9, 0, 0 , 0.9 , 0 , 52)";
             stepCards[+(index + 1)].style.opacity = "25%";
@@ -1101,6 +1108,13 @@ function exam_is_ready_to_start() {
 
         // init 3 layers of question
         for (let index = 0; index < questionCards.length; index++) {
+            if (
+                questionCards[index].classList.contains(
+                    "dg-after-exam-question"
+                )
+            ) {
+                return;
+            }
             if (index == 1) {
                 questionCards[index].style.opacity = "50%";
                 questionCards[index].style.transform =
@@ -1278,6 +1292,16 @@ function check_mobile_number(mobileNumber) {
     }
     return true;
 }
+function check_inputs(inputs){
+    let isEmpty = false;
+    for (let index = 0; index < inputs.length; index++) {
+        if(!inputs[index].value){
+            isEmpty = true;
+            show_notif("لطفا فرم را به صورت کامل پر کنید", "alert");
+        }
+    }
+    return !isEmpty;
+}
 function count_down() {
     // Get the countdown timer element
     let countdownContainer = document.getElementById("dg-countdown-container");
@@ -1336,7 +1360,8 @@ function show_notif(text, type = "alert") {
         close: false,
         gravity: "top", // `top` or `bottom`
         position: "center", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover
+        stopOnFocus: true, // Prevents dismissing of toast on hover,
+        escapeMarkup: false,
         style: {
             background: color,
             borderRadius: "10px",
@@ -1375,6 +1400,17 @@ function find_related_parent_by_className(node, className) {
 }
 /* END helper functions */
 
+function check_current_user_info_and_change_quiz_data_if_needed() {
+    // let infoDiv = document.querySelector(".info");
+    // let isUserLoggedIn = infoDiv.dataset.login === "true" ? true : false;
+    // let isUserValidateMobile = infoDiv.dataset.mobile === "true" ? true : false;
+    // if (isUserLoggedIn) {
+    //     quizData.settings.registerOnSite = false;
+    //     if (isUserValidateMobile) {
+    //         quizData.settings.collectMobileNumber = false;
+    //     }
+    // }
+}
 function make_copy_of_html_parts() {
     // make a copy of parts of html source
     clonedMultipleChoiceAnswer = document

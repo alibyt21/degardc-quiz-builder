@@ -291,7 +291,6 @@ add_action('wp_ajax_nopriv_degardc_quiz_builder_check_validation_code', 'degardc
 
 function degardc_quiz_builder_login_if_exists_register_if_new()
 {
-
     // check_ajax_referer('degardc_register_nonce', 'security');
     $email = sanitize_text_field($_POST['email']);
     $password = sanitize_text_field($_POST['password']);
@@ -351,28 +350,51 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
                 'message' => $wp_insert_user_result->get_error_message(),
             );
             wp_send_json($result);
-        } else {
-            $creds = array(
-                'user_login'    => $email,
-                'user_password' => $password,
-                'remember'      => true
+        }
+        $creds = array(
+            'user_login'    => $email,
+            'user_password' => $password,
+            'remember'      => true
+        );
+        $wp_signon_result = wp_signon($creds, false);
+        if (is_wp_error($wp_signon_result)) {
+            $result = array(
+                'error' => true,
+                'message' =>  'حساب کاربری شما با موفقیت ایجاد شد، اما در ورود شما به سایت مشکلی رخ داده است، لطفا به پشتیبانی اطلاع دهید',
             );
-            $wp_signon_result = wp_signon($creds, false);
-            if (is_wp_error($wp_signon_result)) {
-                $result = array(
-                    'error' => true,
-                    'message' =>  'حساب کاربری شما با موفقیت ایجاد شد، اما در ورود شما به سایت مشکلی رخ داده است، لطفا به پشتیبانی اطلاع دهید',
-                );
-                wp_send_json($result);
-            } else {
-                $result = array(
-                    'error' => false,
-                    'message' => 'حساب کاربری شما با موفقیت ایجاد شد',
-                );
-                wp_send_json($result);
-            }
+            wp_send_json($result);
+        } else {
+            $result = array(
+                'error' => false,
+                'message' => 'حساب کاربری شما با موفقیت ایجاد شد',
+            );
+            wp_send_json($result);
         }
     }
     die();
+}
+add_action('wp_ajax_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
+add_action('wp_ajax_nopriv_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
+
+function degardc_quiz_builder_login_register_with_mobile()
+{
+    // check_ajax_referer('degardc_register_nonce', 'security');
+    $email = sanitize_text_field($_POST['email']);
+    $password = sanitize_text_field($_POST['password']);
+    $mobile = sanitize_text_field($_POST['mobile']);
+    if (empty($email) || empty($password)) {
+        $result = array(
+            'error' => true,
+            'message' => 'لطفا فرم را به صورت کامل تکمیل کنید'
+        );
+        wp_send_json($result);
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $result = array(
+            'error' => true,
+            'message' => 'لطفا ایمیل خود را به صورت صحیح وارد کنید'
+        );
+        wp_send_json($result);
+    }
 }
 /* END FRONT APIs */
