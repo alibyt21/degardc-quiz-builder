@@ -127,8 +127,8 @@ function degardc_quiz_builder_callback($atts)
                         </h1>
                     </div>
                     <div class="extra-field">
-                        <div class="participant-name border border-solid border-gray-200 p-3 rounded-xl my-2">
-                            <input class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
+                        <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                            <input id="participant-name" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
                         </div>
                     </div>
                     <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
@@ -166,8 +166,8 @@ function degardc_quiz_builder_callback($atts)
                         </h1>
                     </div>
                     <div class="extra-field">
-                        <div class="participant-name border border-solid border-gray-200 p-3 rounded-xl my-2">
-                            <input class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
+                        <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                            <input id="participant-name" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
                         </div>
                     </div>
                     <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">

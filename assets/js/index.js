@@ -10,7 +10,7 @@ let quizData = {
     description: "یسری توضیحات",
     settings: {
         requireScore: 70,
-        collectParticipantName: true,
+        collectParticipantName: false,
         collectMobileNumber: true,
         validateMobileNumber: false,
         registerOnSite: true,
@@ -172,6 +172,10 @@ function create_quiz(quizData) {
         //book an appointment
         if (quizData.settings.bookAnAppointment) {
             mainParent.appendChild(clonedBookAnAppointment);
+        }
+
+        if (!quizData.settings.collectParticipantName) {
+            document.getElementById("participant-name").parentNode.remove();
         }
     } else {
         //show result
@@ -640,6 +644,9 @@ function exam_is_ready_to_start() {
                 let password = document.getElementById(
                     "participant-password"
                 ).value;
+                let fullName = quizData.settings.collectParticipantName
+                    ? document.getElementById("participant-name").value
+                    : null;
                 let inputs = document
                     .querySelector(".only-register")
                     .querySelectorAll("input");
@@ -649,7 +656,8 @@ function exam_is_ready_to_start() {
                     try {
                         await handle_request_to_register_login_user(
                             email,
-                            password
+                            password,
+                            fullName
                         );
                         go_to_next_step_animations(index);
                     } catch (error) {
@@ -664,13 +672,17 @@ function exam_is_ready_to_start() {
                     document.getElementById("mobile-number").value;
                 let validationCode =
                     document.getElementById("validation-code").value;
+                let buttonText = singleNextButton.innerHTML;
+                singleNextButton.innerHTML = loaderHTML;
                 try {
                     await handle_request_to_check_validation_code(
                         validationCode,
                         mobileNumber
                     );
                     go_to_next_step_animations(index);
-                } catch (error) {}
+                } catch (error) {
+                    singleNextButton.innerHTML = buttonText;
+                }
             } else {
                 // default - for questions next buttons
                 go_to_next_step_animations(index);
@@ -792,13 +804,18 @@ function exam_is_ready_to_start() {
         }
     }
 
-    async function handle_request_to_register_login_user(email, password) {
+    async function handle_request_to_register_login_user(
+        email,
+        password,
+        fullName
+    ) {
         // send request to register_login user
         try {
             let response = await request_to_api({
                 action: "degardc_quiz_builder_login_if_exists_register_if_new",
                 email,
                 password,
+                fullName,
             });
             if (response.error) {
                 show_notif(response.message, "error");
@@ -1292,10 +1309,10 @@ function check_mobile_number(mobileNumber) {
     }
     return true;
 }
-function check_inputs(inputs){
+function check_inputs(inputs) {
     let isEmpty = false;
     for (let index = 0; index < inputs.length; index++) {
-        if(!inputs[index].value){
+        if (!inputs[index].value) {
             isEmpty = true;
             show_notif("لطفا فرم را به صورت کامل پر کنید", "alert");
         }

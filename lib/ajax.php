@@ -294,6 +294,8 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
     // check_ajax_referer('degardc_register_nonce', 'security');
     $email = sanitize_text_field($_POST['email']);
     $password = sanitize_text_field($_POST['password']);
+    $full_name = sanitize_text_field($_POST['fullName']);
+
     if (empty($email) || empty($password)) {
         $result = array(
             'error' => true,
@@ -324,6 +326,7 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
             );
             wp_send_json($result);
         } else {
+            
             $result = array(
                 'error' => false,
                 'message' => 'شما با موفقیت وارد سایت شدید',
