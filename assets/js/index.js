@@ -12,7 +12,7 @@ let quizData = {
         requireScore: 70,
         collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
+        validateMobileNumber: true,
         registerOnSite: true,
         seprateResult: true,
         showResult: true,
@@ -64,8 +64,6 @@ let clonedMultipleChoiceAnswer,
     clonedMultipleChoiceQuestion,
     clonedCollectMobileNumber,
     clonedRegisterValidate,
-    clonedOnlyValidate,
-    clonedOnlyRegister,
     clonedBookAnAppointment,
     clonedSingleResult,
     clonedResult;
@@ -82,6 +80,7 @@ let currentIndex = 1;
 // before exam functions needs to run
 
 check_current_user_info_and_change_quiz_data_if_needed();
+check_quiz_data_and_make_it_compatible();
 make_copy_of_html_parts();
 get_prev_quiz_result_if_exists();
 
@@ -139,43 +138,38 @@ function create_quiz(quizData) {
         //questions
         append_all_questions_into_html(quizData, mainParent);
 
-        //collect mobile number
         if (quizData.settings.collectMobileNumber) {
+            //collect mobile number
             mainParent.appendChild(clonedCollectMobileNumber);
         }
         if (
-            quizData.settings.collectMobileNumber &&
-            quizData.settings.validateMobileNumber &&
-            quizData.settings.registerOnSite
+            quizData.settings.registerOnSite ||
+            quizData.settings.validateMobileNumber
         ) {
             //register-validate
             mainParent.appendChild(clonedRegisterValidate);
-        } else if (
-            quizData.settings.collectMobileNumber &&
-            quizData.settings.validateMobileNumber &&
-            !quizData.settings.registerOnSite
-        ) {
-            //only-validate
-            mainParent.appendChild(clonedOnlyValidate);
-        } else if (
-            (!quizData.settings.collectMobileNumber ||
-                !quizData.settings.validateMobileNumber) &&
-            quizData.settings.registerOnSite
-        ) {
-            //only-register
-            mainParent.appendChild(clonedOnlyRegister);
+            if (!quizData.settings.collectParticipantName) {
+                document.getElementById("participant-name").parentNode.remove();
+            }
+            if (!quizData.settings.validateMobileNumber) {
+                document.getElementById("validate-part").remove();
+                document
+                    .querySelector(".register-validate")
+                    .querySelector("h1").innerHTML = "ثبت نام / ورود به سایت";
+            }
+            if (!quizData.settings.registerOnSite) {
+                document.getElementById("register-part").remove();
+                document
+                    .querySelector(".register-validate")
+                    .querySelector("h1").innerHTML = "تایید شماره";
+            }
         }
-
         //show result
         mainParent.appendChild(clonedResult);
 
         //book an appointment
         if (quizData.settings.bookAnAppointment) {
             mainParent.appendChild(clonedBookAnAppointment);
-        }
-
-        if (!quizData.settings.collectParticipantName) {
-            document.getElementById("participant-name").parentNode.remove();
         }
     } else {
         //show result
@@ -426,6 +420,7 @@ function limit_to_result_page() {
 
 function create_result() {
     document.querySelector(".result").style.visibility = "visible";
+    document.querySelector(".result").style.opacity = "1";
     // set quiz to finished
     if (quizData.settings.oneAttempt) {
         quizResult.isFinished = true;
@@ -559,6 +554,7 @@ function exam_is_ready_to_start() {
     let stepCards = document.querySelectorAll(".dg-step-card");
     let questionCards = document.querySelectorAll(".dg-question-card");
     let sendNewCode = document.getElementById("dg-send-new-code");
+    let isOneTimePassword;
 
     let insertedId = -1;
     let interval;
@@ -611,14 +607,22 @@ function exam_is_ready_to_start() {
                             clearInterval(interval);
                         }
                         interval = count_down();
-                        go_to_next_step_animations(index);
+                        let buttonPrevText =
+                            start_loading_animation(singleNextButton);
                         try {
-                            await handle_request_to_send_validation_code_api(
+                            handle_request_to_send_validation_code_api(
                                 mobileNumber
                             );
-                        } catch (error) {
-                            back_to_prev_step_animations(index + 1);
-                        }
+                            isOneTimePassword =
+                                await handle_request_to_check_if_is_mobile_number_validated_before(
+                                    mobileNumber
+                                );
+                            if (isOneTimePassword) {
+                                switch_to_only_validate();
+                            }
+                            go_to_next_step_animations(index);
+                        } catch (error) {}
+                        end_loading_animation(singleNextButton, buttonPrevText);
                     } else {
                         // just save mobile in db
                         go_to_next_step_animations(index);
@@ -634,54 +638,111 @@ function exam_is_ready_to_start() {
             } else if (
                 singleNextButton.classList.contains("register-validate-button")
             ) {
-                // register-validate API
-                console.log("register-validate");
-            } else if (
-                singleNextButton.classList.contains("only-register-button")
-            ) {
-                // only register API
-                let email = document.getElementById("participant-email").value;
-                let password = document.getElementById(
-                    "participant-password"
-                ).value;
-                let fullName = quizData.settings.collectParticipantName
-                    ? document.getElementById("participant-name").value
-                    : null;
                 let inputs = document
-                    .querySelector(".only-register")
+                    .querySelector(".register-validate")
                     .querySelectorAll("input");
-                if (check_inputs(inputs)) {
-                    let buttonText = singleNextButton.innerHTML;
-                    singleNextButton.innerHTML = loaderHTML;
-                    try {
-                        await handle_request_to_register_login_user(
-                            email,
-                            password,
-                            fullName
-                        );
-                        go_to_next_step_animations(index);
-                    } catch (error) {
-                        singleNextButton.innerHTML = buttonText;
-                    }
-                }
-            } else if (
-                singleNextButton.classList.contains("only-validate-button")
-            ) {
-                // only validate API
                 let mobileNumber =
                     document.getElementById("mobile-number").value;
-                let validationCode =
-                    document.getElementById("validation-code").value;
-                let buttonText = singleNextButton.innerHTML;
-                singleNextButton.innerHTML = loaderHTML;
-                try {
-                    await handle_request_to_check_validation_code(
-                        validationCode,
-                        mobileNumber
-                    );
-                    go_to_next_step_animations(index);
-                } catch (error) {
-                    singleNextButton.innerHTML = buttonText;
+                if (
+                    quizData.settings.registerOnSite &&
+                    quizData.settings.validateMobileNumber
+                ) {
+                    // register-validate API
+                    let email =
+                        document.getElementById("participant-email").value;
+                    let password = document.getElementById(
+                        "participant-password"
+                    ).value;
+                    let validationCode =
+                        document.getElementById("validation-code").value;
+                    let firstName,
+                        lastName = null;
+                    if (quizData.settings.collectParticipantName) {
+                        firstName = document.getElementById(
+                            "participant-firstname"
+                        ).value;
+                        lastName = document.getElementById(
+                            "participant-lastname"
+                        ).value;
+                    }
+                    if (check_inputs(inputs) && check_email(email)) {
+                        let buttonPrevText =
+                            start_loading_animation(singleNextButton);
+                        try {
+                            await handle_request_to_login_if_exists_register_if_new(
+                                email,
+                                password,
+                                firstName,
+                                lastName
+                            );
+                            await handle_request_to_check_validation_code(
+                                validationCode,
+                                mobileNumber
+                            );
+                            go_to_next_step_animations(index);
+                        } catch (error) {}
+                        end_loading_animation(singleNextButton, buttonPrevText);
+                    }
+                } else if (
+                    quizData.settings.registerOnSite &&
+                    !quizData.settings.validateMobileNumber
+                ) {
+                    // only register API
+                    let email =
+                        document.getElementById("participant-email").value;
+                    let password = document.getElementById(
+                        "participant-password"
+                    ).value;
+                    let firstName,
+                        lastName = null;
+                    if (quizData.settings.collectParticipantName) {
+                        firstName = document.getElementById(
+                            "participant-firstname"
+                        ).value;
+                        lastName = document.getElementById(
+                            "participant-lastname"
+                        ).value;
+                    }
+                    if (check_inputs(inputs) && check_email(email)) {
+                        let buttonPrevText =
+                            start_loading_animation(singleNextButton);
+                        try {
+                            await handle_request_to_login_if_exists_register_if_new(
+                                email,
+                                password,
+                                firstName,
+                                lastName
+                            );
+                            go_to_next_step_animations(index);
+                        } catch (error) {}
+                        end_loading_animation(singleNextButton, buttonPrevText);
+                    }
+                } else if (
+                    !quizData.settings.registerOnSite &&
+                    quizData.settings.validateMobileNumber
+                ) {
+                    // only validate API
+                    let validationCode =
+                        document.getElementById("validation-code").value;
+                    if (check_inputs(inputs)) {
+                        let buttonPrevText =
+                            start_loading_animation(singleNextButton);
+                        try {
+                            if (isOneTimePassword) {
+                                await handle_request_to_login_with_one_time_password(
+                                    validationCode,
+                                    mobileNumber
+                                );
+                            } else {
+                                await handle_request_to_check_validation_code(
+                                    validationCode,
+                                    mobileNumber
+                                );
+                            }
+                            go_to_next_step_animations(index);
+                        } catch (error) {}
+                        end_loading_animation(singleNextButton, buttonPrevText);
+                    }
                 }
             } else {
                 // default - for questions next buttons
@@ -720,6 +781,20 @@ function exam_is_ready_to_start() {
             throw new Error();
         }
     }
+    async function handle_request_to_check_if_is_mobile_number_validated_before(
+        mobileNumber
+    ) {
+        // send request to send validation code
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_check_if_is_mobile_number_validated_before",
+                mobileNumber,
+            });
+            return response.result;
+        } catch (error) {
+            throw new Error();
+        }
+    }
 
     async function handle_request_to_check_validation_code(
         validationCode,
@@ -737,6 +812,27 @@ function exam_is_ready_to_start() {
                 throw new Error();
             } else {
                 // nothing in success
+            }
+        } catch (error) {
+            throw new Error();
+        }
+    }
+    async function handle_request_to_login_with_one_time_password(
+        validationCode,
+        mobileNumber
+    ) {
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_login_with_one_time_password",
+                validationCode,
+                mobileNumber,
+                insertedId,
+            });
+            if (response.error) {
+                show_notif(response.message, "error");
+                throw new Error();
+            } else {
+                show_notif(response.message, "success");
             }
         } catch (error) {
             throw new Error();
@@ -804,19 +900,30 @@ function exam_is_ready_to_start() {
         }
     }
 
-    async function handle_request_to_register_login_user(
+    async function handle_request_to_login_if_exists_register_if_new(
         email,
         password,
-        fullName
+        firstName,
+        lastName
     ) {
         // send request to register_login user
+        let response;
         try {
-            let response = await request_to_api({
-                action: "degardc_quiz_builder_login_if_exists_register_if_new",
-                email,
-                password,
-                fullName,
-            });
+            if (firstName && lastName) {
+                response = await request_to_api({
+                    action: "degardc_quiz_builder_login_if_exists_register_if_new",
+                    email,
+                    password,
+                    firstName,
+                    lastName,
+                });
+            } else {
+                response = await request_to_api({
+                    action: "degardc_quiz_builder_login_if_exists_register_if_new",
+                    email,
+                    password,
+                });
+            }
             if (response.error) {
                 show_notif(response.message, "error");
                 throw new Error();
@@ -827,6 +934,48 @@ function exam_is_ready_to_start() {
             throw new Error();
         }
     }
+    // async function handle_request_to_register_login_user_with_mobile(
+    //     email,
+    //     password,
+    //     mobileNumber,
+    //     validationCode,
+    //     firstName,
+    //     lastName
+    // ) {
+    //     // send request to register_login user
+    //     let response;
+    //     try {
+    //         if (firstName && lastName) {
+    //             response = await request_to_api({
+    //                 action: "degardc_quiz_builder_login_register_with_mobile",
+    //                 email,
+    //                 password,
+    //                 mobileNumber,
+    //                 validationCode,
+    //                 firstName,
+    //                 lastName,
+    //                 insertedId,
+    //             });
+    //         } else {
+    //             response = await request_to_api({
+    //                 action: "degardc_quiz_builder_login_register_with_mobile",
+    //                 email,
+    //                 password,
+    //                 mobileNumber,
+    //                 validationCode,
+    //                 insertedId,
+    //             });
+    //         }
+    //         if (response.error) {
+    //             show_notif(response.message, "error");
+    //             throw new Error();
+    //         } else {
+    //             show_notif(response.message, "success");
+    //         }
+    //     } catch (error) {
+    //         throw new Error();
+    //     }
+    // }
     async function request_to_api(
         data = {
             action: "",
@@ -1292,6 +1441,14 @@ function exam_is_ready_to_start() {
         }
     }
 
+    function switch_to_only_validate() {
+        quizData.settings.registerOnSite = false;
+        document.getElementById("register-part").remove();
+        document
+            .querySelector(".register-validate")
+            .querySelector("h1").innerHTML = "ورود با کد یکبار مصرف";
+    }
+
     setInterval(function () {
         console.log(participantData);
     }, 2000);
@@ -1309,15 +1466,36 @@ function check_mobile_number(mobileNumber) {
     }
     return true;
 }
+function check_email(email) {
+    let hasError = !String(email)
+        .toLowerCase()
+        .match(
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+    if (hasError) {
+        show_notif("لطفا ایمیل خود را به صورت صحیح وارد کنید", "alert");
+    }
+    return !hasError;
+}
 function check_inputs(inputs) {
-    let isEmpty = false;
+    let hasError = false;
     for (let index = 0; index < inputs.length; index++) {
         if (!inputs[index].value) {
-            isEmpty = true;
-            show_notif("لطفا فرم را به صورت کامل پر کنید", "alert");
+            hasError = true;
         }
     }
-    return !isEmpty;
+    if (hasError) {
+        show_notif("لطفا فرم را به صورت کامل پر کنید", "alert");
+    }
+    return !hasError;
+}
+function end_loading_animation(buttonNode, buttonPrevText) {
+    buttonNode.innerHTML = buttonPrevText;
+}
+function start_loading_animation(buttonNode) {
+    let buttonPrevText = buttonNode.innerHTML;
+    buttonNode.innerHTML = loaderHTML;
+    return buttonPrevText;
 }
 function count_down() {
     // Get the countdown timer element
@@ -1418,15 +1596,20 @@ function find_related_parent_by_className(node, className) {
 /* END helper functions */
 
 function check_current_user_info_and_change_quiz_data_if_needed() {
-    // let infoDiv = document.querySelector(".info");
-    // let isUserLoggedIn = infoDiv.dataset.login === "true" ? true : false;
-    // let isUserValidateMobile = infoDiv.dataset.mobile === "true" ? true : false;
-    // if (isUserLoggedIn) {
-    //     quizData.settings.registerOnSite = false;
-    //     if (isUserValidateMobile) {
-    //         quizData.settings.collectMobileNumber = false;
-    //     }
-    // }
+    let infoDiv = document.querySelector(".info");
+    let isUserLoggedIn = infoDiv.dataset.login === "true" ? true : false;
+    let isUserValidateMobile = infoDiv.dataset.mobile === "true" ? true : false;
+    if (isUserLoggedIn) {
+        quizData.settings.registerOnSite = false;
+        if (isUserValidateMobile) {
+            quizData.settings.collectMobileNumber = false;
+        }
+    }
+}
+function check_quiz_data_and_make_it_compatible() {
+    if (!quizData.settings.collectMobileNumber) {
+        quizData.settings.validateMobileNumber = false;
+    }
 }
 function make_copy_of_html_parts() {
     // make a copy of parts of html source
@@ -1449,16 +1632,6 @@ function make_copy_of_html_parts() {
         .querySelector(".register-validate")
         .cloneNode(true);
     document.querySelector(".register-validate").remove();
-
-    clonedOnlyValidate = document
-        .querySelector(".only-validate")
-        .cloneNode(true);
-    document.querySelector(".only-validate").remove();
-
-    clonedOnlyRegister = document
-        .querySelector(".only-register")
-        .cloneNode(true);
-    document.querySelector(".only-register").remove();
 
     clonedBookAnAppointment = document
         .querySelector(".book-an-appointment")

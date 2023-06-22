@@ -11,11 +11,12 @@ function degardc_quiz_builder_callback($atts)
     // $quiz_description = $quiz_data->description;
     // $quiz_questions = $quiz_data->questions;
     // $quiz_settings = $quiz_data->settings;
-    if(is_user_logged_in()){
+    if (is_user_logged_in()) {
         $current_user = wp_get_current_user();
         $user_id = $current_user->ID;
         $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
     }
+
 
 
 ?>
@@ -126,26 +127,35 @@ function degardc_quiz_builder_callback($atts)
                             ثبت نام / ورود به سایت
                         </h1>
                     </div>
-                    <div class="extra-field">
+                    <div id="register-part">
+                        <div class="extra-field">
+                            <div class="flex" id="participant-name">
+                                <div class="flex border border-solid border-gray-200 p-3 rounded-xl my-2 ml-2">
+                                    <input id="participant-firstname" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام" />
+                                </div>
+                                <div class="flex border border-solid border-gray-200 p-3 rounded-xl my-2 mr-2">
+                                    <input id="participant-lastname" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام خانوادگی" />
+                                </div>
+                            </div>
+                        </div>
                         <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                            <input id="participant-name" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
+                            <input id="participant-email" class="flex-auto w-2/3 focus-visible:outline-none" type="email" placeholder="آدرس ایمیل" />
+                        </div>
+                        <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                            <input id="participant-password" class="flex-auto w-2/3 focus-visible:outline-none" type="password" placeholder="پسورد" />
                         </div>
                     </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="participant-email" class="flex-auto w-2/3 focus-visible:outline-none" type="email" placeholder="آدرس ایمیل" />
-                    </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="participant-password" class="flex-auto w-2/3 focus-visible:outline-none" type="password" placeholder="پسورد" />
-                    </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="validation-code" class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
-                    </div>
-                    <div class="flex justify-center text-sm text-gray-400 my-2">
-                        <div class="flex" id="dg-countdown-container">
-                            <div class="mx-2">دریافت مجدد کد تا</div>
-                            <div id="dg-countdown-timer">03:00</div>
+                    <div id="validate-part">
+                        <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
+                            <input id="validation-code" class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
                         </div>
-                        <div id="dg-send-new-code" class="cursor-pointer text-blue-500">دریافت مجدد کد</div>
+                        <div class="flex justify-center text-sm text-gray-400 my-2">
+                            <div class="flex" id="dg-countdown-container">
+                                <div class="mx-2">دریافت مجدد کد تا</div>
+                                <div id="dg-countdown-timer">03:00</div>
+                            </div>
+                            <div id="dg-send-new-code" class="cursor-pointer text-blue-500">دریافت مجدد کد</div>
+                        </div>
                     </div>
                 </div>
                 <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 pt-0 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
@@ -158,59 +168,6 @@ function degardc_quiz_builder_callback($atts)
                 </div>
             </div>
 
-            <div style="opacity:0;" class="only-register dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
-                <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
-                    <div class="text-center my-2">
-                        <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
-                            ثبت نام / ورود به سایت
-                        </h1>
-                    </div>
-                    <div class="extra-field">
-                        <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                            <input id="participant-name" class="flex-auto w-2/3 focus-visible:outline-none" type="text" placeholder="نام و نام خانوادگی" />
-                        </div>
-                    </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="participant-email" class="flex-auto w-2/3 focus-visible:outline-none" type="email" placeholder="آدرس ایمیل" />
-                    </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="participant-password" class="flex-auto w-2/3 focus-visible:outline-none" type="password" placeholder="پسورد" />
-                    </div>
-                </div>
-                <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 pt-0 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
-                    <button class="dg-next-step-button only-register-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
-                        ثبت نام / ورود
-                    </button>
-                </div>
-            </div>
-
-            <div style="opacity:0;" class="only-validate dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
-                <div class="dg-step-block flex justify-center flex-col mx-auto max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl max-w-[500px]">
-                    <div class="text-center my-2">
-                        <h1 class="text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center">
-                            تایید شماره
-                        </h1>
-                    </div>
-                    <div class="border border-solid border-gray-200 p-3 rounded-xl my-2">
-                        <input id="validation-code" class="flex-auto w-full focus-visible:outline-none" type="number" placeholder="کد 4 رقمی ارسال شده را وارد کنید" />
-                    </div>
-                    <div class="flex justify-center text-sm text-gray-400 my-2">
-                        <div class="flex" id="dg-countdown-container">
-                            <div class="mx-2">دریافت مجدد کد تا</div>
-                            <div id="dg-countdown-timer">03:00</div>
-                        </div>
-                        <div id="dg-send-new-code" class="cursor-pointer text-blue-500">دریافت مجدد کد</div>
-                    </div>
-                </div>
-                <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 pt-0 rounded-b-xl absolute left-0 right-0 bottom-0 w-full max-w-[500px]">
-                    <button class="dg-next-step-button only-validate-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
-                        تایید شماره
-                    </button>
-                    <button class="dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 flex justify-center items-center h-[63px]">
-                        اصلاح شماره
-                    </button>
-                </div>
-            </div>
 
             <div style="opacity:0;" class="book-an-appointment flex justify-center dg-question-card dg-after-exam-question dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out items-center">
                 <div class="dg-step-block p-5 md:p-7 lg:p-10">

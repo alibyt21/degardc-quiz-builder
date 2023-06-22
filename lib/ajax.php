@@ -94,23 +94,6 @@ function degardc_quiz_builder_send_validation_code_ajax()
         );
         wp_send_json($result);
     }
-    // $args = array(
-    //     'meta_query' => array(
-    //         array(
-    //             'key' => 'degardc_mobile_number',
-    //             'value' => $mobile_number,
-    //             'compare' => '='
-    //         )
-    //     )
-    // );
-    // $user_with_same_mobile_number = get_users($args);
-    // if ($user_with_same_mobile_number) {
-    //     $result = array(
-    //         'error' => true,
-    //         'message' =>  'یک حساب کاربری فعال با شماره وارد شده در سیستم وجود دارد و این شماره قابل استفاده مجدد نیست',
-    //     );
-    //     wp_send_json($result);
-    // }
 
     global $wpdb;
     $column = "mobile_number";
@@ -216,7 +199,17 @@ function degardc_quiz_builder_submit_answers_ajax()
 
     global $wpdb;
     $table = $wpdb->prefix . 'degardcquiz_answers';
-    $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
+    $user_id = get_current_user_id();
+    if ($user_id) {
+        $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
+        if ($user_mobile_number) {
+            // happen when user loggined and validated mobile before
+            $row = array('quiz_id' => $quiz_id, 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
+        }
+    }else{
+        // happen for new users
+        $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
+    }
     $db_result = $wpdb->insert($table, $row);
     $insert_id = $wpdb->insert_id;
     if (!$db_result) {
@@ -279,6 +272,21 @@ function degardc_quiz_builder_check_validation_code()
         );
         wp_send_json($result);
     }
+
+    /****** update user meta and billing phone with validated mobile number *******/
+    $user_id = get_current_user_id();
+    if ($user_id) {
+        if (!update_user_meta($user_id, 'degardc_mobile_number', $mobile_number) || !update_user_meta($user_id, 'billing_phone', $mobile_number)) {
+            $result = array(
+                'error' => true,
+                'message' =>  'در ذخیره سازی شماره همراه شما خطایی رخ داده است، لطفا چند دقیقه بعد مجددا تلاش کنید',
+            );
+            wp_send_json($result);
+        }
+    }
+    /****** update user meta and billing phone with validated mobile number *******/
+
+
     $result = array(
         'error' => false,
         'message' =>  'شماره شما با موفقیت تایید شد',
@@ -288,13 +296,125 @@ function degardc_quiz_builder_check_validation_code()
 add_action('wp_ajax_degardc_quiz_builder_check_validation_code', 'degardc_quiz_builder_check_validation_code');
 add_action('wp_ajax_nopriv_degardc_quiz_builder_check_validation_code', 'degardc_quiz_builder_check_validation_code');
 
+function degardc_quiz_builder_check_if_is_mobile_number_validated_before()
+{
+    $mobile_number = sanitize_text_field($_POST['mobileNumber']);
+    $args = array(
+        'meta_query' => array(
+            array(
+                'key' => 'degardc_mobile_number',
+                'value' => $mobile_number,
+                'compare' => '='
+            )
+        )
+    );
+    $isExists = get_users($args) ? true : false;
+    $result = array(
+        'result' => $isExists,
+    );
+    wp_send_json($result);
+}
+add_action('wp_ajax_degardc_quiz_builder_check_if_is_mobile_number_validated_before', 'degardc_quiz_builder_check_if_is_mobile_number_validated_before');
+add_action('wp_ajax_nopriv_degardc_quiz_builder_check_if_is_mobile_number_validated_before', 'degardc_quiz_builder_check_if_is_mobile_number_validated_before');
+
+
+function degardc_quiz_builder_login_with_one_time_password()
+{
+    $mobile_number = sanitize_text_field($_POST['mobileNumber']);
+    $user_validation_code = sanitize_text_field($_POST['validationCode']);
+    $inserted_id = sanitize_text_field($_POST['insertedId']);
+    if (empty($user_validation_code)) {
+        $result = array(
+            'error' => true,
+            'message' =>  'لطفا کد ارسال شده را به صورت کامل وارد کنید',
+        );
+        wp_send_json($result);
+    }
+
+    $args = array(
+        'meta_query' => array(
+            array(
+                'key' => 'degardc_mobile_number',
+                'value' => $mobile_number,
+                'compare' => '='
+            )
+        )
+    );
+    $user_with_same_mobile_number = get_users($args)[0];
+    if (!$user_with_same_mobile_number) {
+        $result = array(
+            'error' => true,
+            'message' =>  'حساب کاربری با این شماره یافت نشد',
+        );
+        wp_send_json($result);
+    }
+    $roles_array = $user_with_same_mobile_number->roles;
+    foreach ($roles_array as $single) {
+        if (strtolower($single) == "administrator") {
+            $result = array(
+                'error' => true,
+                'message' =>  'شما مجاز به انجام این عملیات نیستید',
+            );
+            wp_send_json($result);
+            die();
+        }
+    }
+
+
+    global $wpdb;
+    $column = "mobile_number";
+    $table = $wpdb->prefix . 'degardcquiz_answers';
+    $last_user_try = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $inserted_id")->$column);
+    $system_validation_code = $last_user_try->code;
+    if ($system_validation_code != $user_validation_code) {
+        $result = array(
+            'error' => true,
+            'message' =>  'کد وارد شده اشتباه است، لطفا مجددا تلاش کنید',
+        );
+        wp_send_json($result);
+    }
+
+    if ($mobile_number != $last_user_try->number) {
+        $result = array(
+            'error' => true,
+            'message' =>  'شماره همراه وارد شده نامعتبر است، در صورت نیاز به پشتیبانی اطلاع دهید',
+        );
+        wp_send_json($result);
+    }
+    $data = array('mobile_number' => $mobile_number, 'is_verified' => true);
+    $where = array('id' => $inserted_id);
+    $db_result = $wpdb->update($table, $data, $where);
+    if (!$db_result) {
+        $result = array(
+            'error' => true,
+            'message' =>  "خطایی رخ داده است، کد خطا: 11",
+        );
+        wp_send_json($result);
+    }
+
+    // login user without password
+    wp_clear_auth_cookie();
+    wp_set_current_user($user_with_same_mobile_number->ID);
+    wp_set_auth_cookie($user_with_same_mobile_number->ID, 1, is_ssl());
+
+    $result = array(
+        'error' => false,
+        'message' =>  'شما با موفقیت وارد سایت شدید',
+    );
+    wp_send_json($result);
+}
+add_action('wp_ajax_degardc_quiz_builder_login_with_one_time_password', 'degardc_quiz_builder_login_with_one_time_password');
+add_action('wp_ajax_nopriv_degardc_quiz_builder_login_with_one_time_password', 'degardc_quiz_builder_login_with_one_time_password');
+
+
 
 function degardc_quiz_builder_login_if_exists_register_if_new()
 {
     // check_ajax_referer('degardc_register_nonce', 'security');
     $email = sanitize_text_field($_POST['email']);
     $password = sanitize_text_field($_POST['password']);
-    $full_name = sanitize_text_field($_POST['fullName']);
+    $first_name = sanitize_text_field($_POST['firstName']);
+    $last_name = sanitize_text_field($_POST['lastName']);
 
     if (empty($email) || empty($password)) {
         $result = array(
@@ -326,7 +446,7 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
             );
             wp_send_json($result);
         } else {
-            
+
             $result = array(
                 'error' => false,
                 'message' => 'شما با موفقیت وارد سایت شدید',
@@ -343,6 +463,16 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
             'user_pass'  => $password,
             'show_admin_bar_front' => 'false',
         );
+        if ($first_name && $last_name) {
+            $creds = array(
+                'user_login' => $user_login,
+                'user_email' => $email,
+                'user_pass'  => $password,
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'show_admin_bar_front' => 'false',
+            );
+        }
 
         //in success return new user id
         $wp_insert_user_result = wp_insert_user($creds);
@@ -354,6 +484,7 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
             );
             wp_send_json($result);
         }
+
         $creds = array(
             'user_login'    => $email,
             'user_password' => $password,
@@ -379,25 +510,79 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
 add_action('wp_ajax_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
 add_action('wp_ajax_nopriv_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
 
-function degardc_quiz_builder_login_register_with_mobile()
-{
-    // check_ajax_referer('degardc_register_nonce', 'security');
-    $email = sanitize_text_field($_POST['email']);
-    $password = sanitize_text_field($_POST['password']);
-    $mobile = sanitize_text_field($_POST['mobile']);
-    if (empty($email) || empty($password)) {
-        $result = array(
-            'error' => true,
-            'message' => 'لطفا فرم را به صورت کامل تکمیل کنید'
-        );
-        wp_send_json($result);
-    }
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $result = array(
-            'error' => true,
-            'message' => 'لطفا ایمیل خود را به صورت صحیح وارد کنید'
-        );
-        wp_send_json($result);
-    }
-}
+// function degardc_quiz_builder_login_register_with_mobile()
+// {
+//     // check_ajax_referer('degardc_register_nonce', 'security');
+//     $email = sanitize_text_field($_POST['email']);
+//     $password = sanitize_text_field($_POST['password']);
+//     $user_validation_code = sanitize_text_field($_POST['validationCode']);
+//     $inserted_id = sanitize_text_field($_POST['insertedId']);
+//     $mobile_number = sanitize_text_field($_POST['mobileNumber']);
+//     $first_name = sanitize_text_field($_POST['firstName']);
+//     $last_name = sanitize_text_field($_POST['lastName']);
+
+//     if (empty($email) || empty($password) || empty($user_validation_code)) {
+//         $result = array(
+//             'error' => true,
+//             'message' => 'لطفا فرم را به صورت کامل تکمیل کنید'
+//         );
+//         wp_send_json($result);
+//     }
+//     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+//         $result = array(
+//             'error' => true,
+//             'message' => 'لطفا ایمیل خود را به صورت صحیح وارد کنید'
+//         );
+//         wp_send_json($result);
+//     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//     global $wpdb;
+//     $column = "mobile_number";
+//     $table = $wpdb->prefix . 'degardcquiz_answers';
+//     $last_user_try = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $inserted_id")->$column);
+//     $system_validation_code = $last_user_try->code;
+//     if ($system_validation_code != $user_validation_code) {
+//         $result = array(
+//             'error' => true,
+//             'message' =>  'کد وارد شده اشتباه است، لطفا مجددا تلاش کنید',
+//         );
+//         wp_send_json($result);
+//     }
+
+//     if ($mobile_number != $last_user_try->number) {
+//         $result = array(
+//             'error' => true,
+//             'message' =>  'شماره همراه وارد شده نامعتبر است، در صورت نیاز به پشتیبانی اطلاع دهید',
+//         );
+//         wp_send_json($result);
+//     }
+//     $data = array('mobile_number' => $mobile_number, 'is_verified' => true);
+//     $where = array('id' => $inserted_id);
+//     $db_result = $wpdb->update($table, $data, $where);
+//     if (!$db_result) {
+//         $result = array(
+//             'error' => true,
+//             'message' =>  "خطایی رخ داده است، کد خطا: 11",
+//         );
+//         wp_send_json($result);
+//     }
+//     $result = array(
+//         'error' => false,
+//         'message' =>  'شماره شما با موفقیت تایید شد',
+//     );
+//     wp_send_json($result);
+// }
 /* END FRONT APIs */
