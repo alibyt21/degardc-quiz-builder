@@ -200,13 +200,11 @@ function degardc_quiz_builder_submit_answers_ajax()
     global $wpdb;
     $table = $wpdb->prefix . 'degardcquiz_answers';
     $user_id = get_current_user_id();
-    if ($user_id) {
-        $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
-        if ($user_mobile_number) {
-            // happen when user loggined and validated mobile before
-            $row = array('quiz_id' => $quiz_id, 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
-        }
-    }else{
+    $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
+    if ($user_id && $user_mobile_number) {
+        // happen when user loggined and validated mobile before
+        $row = array('quiz_id' => $quiz_id, 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
+    } else {
         // happen for new users
         $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
     }
@@ -215,7 +213,7 @@ function degardc_quiz_builder_submit_answers_ajax()
     if (!$db_result) {
         $result = array(
             'error' => true,
-            'message' =>  "خطایی رخ داده است، کد خطا: 11",
+            'message' =>  $row,
         );
         wp_send_json($result);
     }
@@ -268,7 +266,7 @@ function degardc_quiz_builder_check_validation_code()
     if (!$db_result) {
         $result = array(
             'error' => true,
-            'message' =>  "خطایی رخ داده است، کد خطا: 11",
+            'message' =>  "خطایی رخ داده است، کد خطا: 13",
         );
         wp_send_json($result);
     }
@@ -387,7 +385,7 @@ function degardc_quiz_builder_login_with_one_time_password()
     if (!$db_result) {
         $result = array(
             'error' => true,
-            'message' =>  "خطایی رخ داده است، کد خطا: 11",
+            'message' =>  "خطایی رخ داده است، کد خطا: 15",
         );
         wp_send_json($result);
     }

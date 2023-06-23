@@ -4,14 +4,15 @@ let quizData = {
   description: "یسری توضیحات",
   settings: {
     requireScore: 70,
+    collectParticipantName: false,
     collectMobileNumber: true,
-    validateMobileNumber: false,
-    registerOnSite: false,
+    validateMobileNumber: true,
+    registerOnSite: true,
     seprateResult: true,
     showResult: true,
     bookAnAppointment: true,
     oneAttempt: false,
-  },
+},
   questions: [
     {
       id: 1,
@@ -241,14 +242,15 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 70,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
-        registerOnSite: false,
+        validateMobileNumber: true,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
-      },
+    },
       questions: [
         {
           id: 21,
@@ -478,14 +480,15 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 75,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
-        registerOnSite: false,
+        validateMobileNumber: true,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
-      },
+    },
       questions: [
         {
           id: 41,
@@ -715,14 +718,15 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 80,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
-        registerOnSite: false,
+        validateMobileNumber: true,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
-      },
+    },
       questions: [
         {
           id: 61,
@@ -952,14 +956,15 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 85,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
-        registerOnSite: false,
+        validateMobileNumber: true,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
-      },
+    },
       questions: [
         {
           id: 81,
@@ -1189,14 +1194,15 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 90,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
-        registerOnSite: false,
+        validateMobileNumber: true,
+        registerOnSite: true,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
         oneAttempt: false,
-      },
+    },
       questions: [
         {
           id: 101,
