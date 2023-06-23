@@ -46,7 +46,7 @@ function degardc_quiz_builder_callback($atts)
             <div class="dg-step-card dg-entrance-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
                 <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
                     <div class="mx-auto w-full text-center">
-                        <img class="mx-auto max-w-[300px] mb-7" src="https://www.izaban.org/wp-content/uploads/elementor/thumbs/logo__2_-removebg-preview-ptzef6xvxwbkibnt8fw570yem3npogba2jd043xheg.png" alt="">
+                        <img style="width: 100px;" class="mx-auto mb-7" src="https://www.izaban.org/wp-content/uploads/elementor/thumbs/logo__2_-removebg-preview-ptzef6xvxwbkibnt8fw570yem3npogba2jd043xheg.png" alt="">
                         <h1 class="quiz-name text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center"></h1>
                     </div>
 
@@ -65,10 +65,10 @@ function degardc_quiz_builder_callback($atts)
                     <div class="text-gray-400">
                         بهترین پاسخ را انتخاب کنید
                     </div>
-                    <div class="question question-name text-2xl my-5 mb-7">
+                    <div style="direction: ltr;" class="question question-name text-2xl my-5 mb-7">
                         question name
                     </div>
-                    <div class="answer-block w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2" data-qtype="single-option">
+                    <div style="direction: ltr;" class="answer-block w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2" data-qtype="single-option">
                         <div class="sample-multiple-choice-answer option">
                             <div class="bullet">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 check">

@@ -454,7 +454,9 @@ path.blue {
 /*end ticket*/
 
 
-
+.quiz-description{
+    direction: rtl;
+}
 
 .dg-next-step-button {
     color: #ffffff !important;
@@ -507,6 +509,7 @@ path.blue {
     border: 1px solid #cccccc;
     border-radius: 100%;
     margin-left: 10px;
+    margin-right: 10px;
     background-color: #ffffff;
     padding: 2px;
 }
@@ -639,6 +642,10 @@ path.blue {
 
 .ml-5 {
     margin-left: 1.25rem;
+}
+
+.mr-5 {
+    margin-right: 1.25rem;
 }
 
 .mr-2 {

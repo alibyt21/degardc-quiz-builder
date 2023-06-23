@@ -6,18 +6,19 @@ const QUESTION_TYPES = {
 const loaderHTML = '<div class="loading-circle"></div>';
 let quizData = {
     group: 1,
-    name: "اولین آزمون زبان انگلیسی",
-    description: "یسری توضیحات",
+    name: "آزمون تعیین سطح زبان کودکان",
+    description: `تعداد سوالات: 120 سوال در قالب 6 سطح مختلف</br>
+    هرکس تنها یکبار قادر به شرکت در این آزمون است، بنابراین تنها درصورتی که در شرایط مناسب (زمان و مکان مناسب و برخورداری از تمرکز کافی) هستید برای شرکت در آزمون بر روی دکمه زیر کلیک کلیک کنید تا آزمون برای شما شروع شود.`,
     resultMessage: [
         {
             min: 0,
             max: 30,
-            message: "0-30",
+            message: "",
         },
         {
             min: 31,
             max: 50,
-            message: "31-50",
+            message: "",
         },
     ],
     settings: {
