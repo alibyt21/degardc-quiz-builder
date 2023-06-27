@@ -126,7 +126,7 @@ function degardc_quiz_builder_send_validation_code_ajax()
     if (!$db_result) {
         $result = array(
             'error' => true,
-            'message' =>  gettype($degardc_validation_code),
+            'message' => "خطایی رخ داده است، کد خطا: 19",
         );
         wp_send_json($result);
     }
@@ -213,13 +213,13 @@ function degardc_quiz_builder_submit_answers_ajax()
     if (!$db_result) {
         $result = array(
             'error' => true,
-            'message' =>  $row,
+            'message' => "خطایی رخ داده است، کد خطا: 17",
         );
         wp_send_json($result);
     }
     $result = array(
         'error' => false,
-        'message' =>  $insert_id,
+        'message' => $insert_id,
     );
     wp_send_json($result);
 }

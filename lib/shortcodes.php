@@ -65,10 +65,10 @@ function degardc_quiz_builder_callback($atts)
                     <div class="text-gray-400">
                         بهترین پاسخ را انتخاب کنید
                     </div>
-                    <div style="direction: ltr;" class="question question-name text-2xl my-5 mb-7">
+                    <div class="question question-name text-2xl my-5 mb-7">
                         question name
                     </div>
-                    <div style="direction: ltr;" class="answer-block w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2" data-qtype="single-option">
+                    <div class="answer-block w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2" data-qtype="single-option">
                         <div class="sample-multiple-choice-answer option">
                             <div class="bullet">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 check">
