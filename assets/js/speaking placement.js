@@ -1,16 +1,30 @@
-let quizData = {
-  group: 1,
+var quizData = {
+  group: 13,
   name: "آزمون تعیین سطح مکالمه",
-  description: "",
+  description: `تعداد سوالات: 50 سوال</br>
+    هرکس تنها یکبار قادر به شرکت در این آزمون است، بنابراین تنها درصورتی که در شرایط مناسب (زمان و مکان مناسب و برخورداری از تمرکز کافی) هستید برای شرکت در آزمون بر روی دکمه زیر کلیک کلیک کنید تا آزمون برای شما شروع شود.`,
+  resultMessage: [
+    {
+      min: 0,
+      max: 30,
+      message: "",
+    },
+    {
+      min: 31,
+      max: 50,
+      message: "",
+    },
+  ],
   settings: {
     requireScore: 70,
+    collectParticipantName: false,
     collectMobileNumber: true,
-    validateMobileNumber: false,
+    validateMobileNumber: true,
     registerOnSite: false,
     seprateResult: true,
     showResult: true,
     bookAnAppointment: true,
-    oneAttempt: false,
+    oneAttempt: true,
   },
   questions: [
     {

@@ -55,35 +55,35 @@ register_activation_hook(__FILE__, 'degardc_quiz_builder_create_db_table');
 
 
 // START پنل ادمین
-add_action('admin_menu', 'degardc_quiz_builder_menu_pages');
-function degardc_quiz_builder_menu_pages()
-{
-    add_menu_page(
-        'آزمون ساز',
-        'آزمون ساز',
-        'administrator',
-        'degardc-quiz-builder',
-        'degardc_quiz_builder_main_page',
-        'dashicons-forms',
-        2000
-    );
-    add_submenu_page(
-        'degardc-quiz-builder',
-        'همه آزمون‌ها',
-        'همه آزمون‌ها',
-        'administrator',
-        'degardc-quiz-builder',
-        'degardc_quiz_builder_main_page',
-    );
-    add_submenu_page(
-        'degardc-quiz-builder',
-        'افزودن آزمون',
-        'افزودن آزمون',
-        'administrator',
-        'degardc-quiz-builder-new',
-        'degardc_quiz_builder_new_page',
-    );
-}
+// add_action('admin_menu', 'degardc_quiz_builder_menu_pages');
+// function degardc_quiz_builder_menu_pages()
+// {
+//     add_menu_page(
+//         'آزمون ساز',
+//         'آزمون ساز',
+//         'administrator',
+//         'degardc-quiz-builder',
+//         'degardc_quiz_builder_main_page',
+//         'dashicons-forms',
+//         2000
+//     );
+//     add_submenu_page(
+//         'degardc-quiz-builder',
+//         'همه آزمون‌ها',
+//         'همه آزمون‌ها',
+//         'administrator',
+//         'degardc-quiz-builder',
+//         'degardc_quiz_builder_main_page',
+//     );
+//     add_submenu_page(
+//         'degardc-quiz-builder',
+//         'افزودن آزمون',
+//         'افزودن آزمون',
+//         'administrator',
+//         'degardc-quiz-builder-new',
+//         'degardc_quiz_builder_new_page',
+//     );
+// }
 
 
 function degardc_quiz_builder_new_page()

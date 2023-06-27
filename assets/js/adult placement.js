@@ -1,16 +1,30 @@
 let quizData = {
-  group: 1,
-  name: "تعیین سطح بزرگسالان - A1",
-  description: "",
+  group: 12,
+  name: "آزمون تعیین سطح بزرگسالان",
+  description: `تعداد سوالات: 100 سوال در قالب 6 سطح مختلف</br>
+    هرکس تنها یکبار قادر به شرکت در این آزمون است، بنابراین تنها درصورتی که در شرایط مناسب (زمان و مکان مناسب و برخورداری از تمرکز کافی) هستید برای شرکت در آزمون بر روی دکمه زیر کلیک کلیک کنید تا آزمون برای شما شروع شود.`,
+  resultMessage: [
+    {
+      min: 0,
+      max: 30,
+      message: "",
+    },
+    {
+      min: 31,
+      max: 50,
+      message: "",
+    },
+  ],
   settings: {
     requireScore: 0,
+    collectParticipantName: false,
     collectMobileNumber: true,
-    validateMobileNumber: false,
+    validateMobileNumber: true,
     registerOnSite: false,
     seprateResult: true,
     showResult: true,
     bookAnAppointment: true,
-    oneAttempt: false,
+    oneAttempt: true,
   },
   questions: [
     {
@@ -241,13 +255,14 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 0,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
+        validateMobileNumber: true,
         registerOnSite: false,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
-        oneAttempt: false,
+        oneAttempt: true,
       },
       questions: [
         {
@@ -478,13 +493,14 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 0,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
+        validateMobileNumber: true,
         registerOnSite: false,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
-        oneAttempt: false,
+        oneAttempt: true,
       },
       questions: [
         {
@@ -658,6 +674,17 @@ let quizData = {
       group: 4,
       name: "آزمون تعیین سطح بزرگسالان - B2",
       description: "",
+      settings: {
+        requireScore: 0,
+        collectParticipantName: false,
+        collectMobileNumber: true,
+        validateMobileNumber: true,
+        registerOnSite: false,
+        seprateResult: true,
+        showResult: true,
+        bookAnAppointment: true,
+        oneAttempt: true,
+      },
       questions: [
         {
           id: 56,
@@ -873,6 +900,17 @@ let quizData = {
       group: 5,
       name: "تعیین سطح بزرگسالان - C1",
       description: "",
+      settings: {
+        requireScore: 0,
+        collectParticipantName: false,
+        collectMobileNumber: true,
+        validateMobileNumber: true,
+        registerOnSite: false,
+        seprateResult: true,
+        showResult: true,
+        bookAnAppointment: true,
+        oneAttempt: true,
+      },
       questions: [
         {
           id: 76,
@@ -1047,13 +1085,14 @@ let quizData = {
       description: "",
       settings: {
         requireScore: 0,
+        collectParticipantName: false,
         collectMobileNumber: true,
-        validateMobileNumber: false,
+        validateMobileNumber: true,
         registerOnSite: false,
         seprateResult: true,
         showResult: true,
         bookAnAppointment: true,
-        oneAttempt: false,
+        oneAttempt: true,
       },
       questions: [
         {
