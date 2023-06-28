@@ -15,6 +15,8 @@
 
 define('DEGARDC_QUIZ_BUILDER_URL', plugin_dir_url(__FILE__));
 define('DEGARDC_QUIZ_BUILDER_PATH', plugin_dir_path(__FILE__));
+define('DEGARDC_QUIZ_TABLE','degardcquiz_quizes');
+define('DEGARDC_ANSWER_TABLE','degardcquiz_answers');
 
 include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/jdf.php';
 include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/hooks.php';
@@ -25,7 +27,7 @@ include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/ajax.php';
 function degardc_quiz_builder_create_db_table()
 {
     global $wpdb;
-    $table_name1 = $wpdb->prefix . "degardcquiz_quizes";
+    $table_name1 = $wpdb->prefix . DEGARDC_QUIZ_TABLE;
     $charset_collate = $wpdb->get_charset_collate();
     $sql1 = "CREATE TABLE IF NOT EXISTS $table_name1 (
       id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -34,7 +36,7 @@ function degardc_quiz_builder_create_db_table()
     ) $charset_collate;";
 
 
-    $table_name2 = $wpdb->prefix . "degardcquiz_answers";
+    $table_name2 = $wpdb->prefix . DEGARDC_ANSWER_TABLE;
     $charset_collate = $wpdb->get_charset_collate();
     $sql2 = "CREATE TABLE IF NOT EXISTS $table_name2 (
       id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -88,8 +90,12 @@ function degardc_quiz_builder_menu_pages()
 
 function degardc_quiz_builder_new_page()
 {
-    include DEGARDC_QUIZ_BUILDER_PATH . '/tpl/admin/admin-dashboard-html.php';
+    include DEGARDC_QUIZ_BUILDER_PATH . '/tpl/admin/add-new-quiz-html.php';
 }
 function degardc_quiz_builder_main_page()
 {
+    global $wpdb;
+    $table_name = $wpdb->prefix . DEGARDC_QUIZ_TABLE;
+    $results = $wpdb->get_results("SELECT * FROM $table_name");
+    include DEGARDC_QUIZ_BUILDER_PATH . '/tpl/admin/all-quiz-html.php';
 }
