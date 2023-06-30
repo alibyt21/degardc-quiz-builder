@@ -30,7 +30,7 @@ function degardc_quiz_builder_create_db_table()
     $table_name1 = $wpdb->prefix . DEGARDC_QUIZ_TABLE;
     $charset_collate = $wpdb->get_charset_collate();
     $sql1 = "CREATE TABLE IF NOT EXISTS $table_name1 (
-      id bigint(20) NOT NULL AUTO_INCREMENT,
+      id int(11) NOT NULL AUTO_INCREMENT,
       options text(4095) NOT NULL,
       PRIMARY KEY id (id)
     ) $charset_collate;";
@@ -85,8 +85,41 @@ function degardc_quiz_builder_menu_pages()
         'degardc-quiz-builder-new',
         'degardc_quiz_builder_new_page',
     );
+    add_submenu_page(
+        'degardc-quiz-builder',
+        'پاسخ‌ها',
+        'پاسخ‌ها',
+        'administrator',
+        'degardc-quiz-builder-answers',
+        'degardc_quiz_builder_answers_page',
+    );
+    add_submenu_page(
+        'degardc-quiz-builder',
+        'تنظیمات',
+        'تنظیمات',
+        'administrator',
+        'degardc-quiz-builder-settings',
+        'degardc_quiz_builder_settings_page',
+    );
 }
 
+function degardc_quiz_builder_answers_page(){
+    $quiz_id = $_GET['id'];
+    global $wpdb;
+    $answer_table_name = $wpdb->prefix . DEGARDC_ANSWER_TABLE;
+    $quiz_table_name = $wpdb->prefix . DEGARDC_QUIZ_TABLE;
+    if($quiz_id){
+        $results = $wpdb->get_results("SELECT * FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id WHERE quiz_id = $quiz_id");
+    }else{
+        $results = $wpdb->get_results("SELECT * FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id");
+    }
+    // var_dump($results);
+    include DEGARDC_QUIZ_BUILDER_PATH . '/tpl/admin/answers-html.php';
+}
+
+function degardc_quiz_builder_settings_page(){
+
+}
 
 function degardc_quiz_builder_new_page()
 {

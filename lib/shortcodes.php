@@ -4,7 +4,7 @@ function degardc_quiz_builder_callback($atts)
 {
     // global $wpdb;
     // $column = "options";
-    // $id = $atts['id'];
+    $id = $atts['id'];
     // $table = $wpdb->prefix . 'degardcquiz_quizes';
     // $quiz_data = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $id")->$column);
     // $quiz_name = $quiz_data->name;
@@ -25,7 +25,7 @@ function degardc_quiz_builder_callback($atts)
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/toastify.min.css' ?>" />
     <script type="text/javascript" src="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/js/toastify.min.js' ?>"></script>
 
-    <div class="info" data-login="<?= is_user_logged_in() ? "true" : "false" ?>" data-mobile="<?= $user_mobile_number ? "true" : "false" ?>"></div>
+    <div class="info" data-group="<?= $id ?>" data-login="<?= is_user_logged_in() ? "true" : "false" ?>" data-mobile="<?= $user_mobile_number ? "true" : "false" ?>"></div>
     <div class="hidden bg-white absolute top-4 left-2 h-2 right-2 w-auto rounded-xl my-2 transition-all ease-in-out duration-1000" id="dg-progress-bar-container" style="visibility: hidden; opacity: 0;">
         <div class="dg-progress-bar absolute right-0 bg-blue-500 h-2 rounded-xl transition-all duration-1000 ease-in-out" style="width: 0%;"></div>
     </div>
@@ -46,10 +46,8 @@ function degardc_quiz_builder_callback($atts)
             <div class="dg-step-card dg-entrance-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
                 <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
                     <div class="mx-auto w-full text-center">
-                        <img style="width: 100px;" class="mx-auto mb-7" src="https://www.izaban.org/wp-content/uploads/elementor/thumbs/logo__2_-removebg-preview-ptzef6xvxwbkibnt8fw570yem3npogba2jd043xheg.png" alt="">
                         <h1 class="quiz-name text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center"></h1>
                     </div>
-
                     <div class="quiz-description max-w-[500px] border border-solid border-gray-200 p-2 md:p-4 lg:p-6 rounded-xl my-10 mx-auto text-justify"></div>
                 </div>
 
@@ -60,7 +58,7 @@ function degardc_quiz_builder_callback($atts)
                 </div>
             </div>
 
-            <div class="sample-multiple-choice-question dg-step-card dg-question-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out flex items-center">
+            <div class="sample-multiple-choice-question dg-step-card dg-question-card bg-white shadow-lg absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out flex items-center">
                 <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
                     <div class="text-gray-400">
                         بهترین پاسخ را انتخاب کنید
@@ -269,14 +267,14 @@ function degardc_quiz_builder_callback($atts)
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 pt-0 rounded-b-xl left-0 right-0 bottom-0 w-full max-w-[500px]">
+                <!-- <div class="flex flex-col justify-center mx-auto p-5 bg-white md:p-7 lg:p-10 pt-0 rounded-b-xl left-0 right-0 bottom-0 w-full max-w-[500px]">
                     <button class="dg-next-step-button mb-3 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
                         تعیین سطح شفاهی
                     </button>
                     <button class="hidden dg-prev-step-button text-gray-500 border border-solid border-gray-200 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 flex justify-center items-center h-[63px]">
 
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

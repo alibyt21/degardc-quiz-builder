@@ -13,7 +13,7 @@ function degardc_quiz_builder_save_quiz_data_ajax()
         $where = array('id' => $id);
         $db_result = $wpdb->update($table, $data, $where);
         $result = array(
-            'error' => true,
+            'error' => false,
             'message' => $db_result
         );
         wp_send_json($result);
@@ -24,7 +24,7 @@ function degardc_quiz_builder_save_quiz_data_ajax()
         $db_result = $wpdb->insert($table, $row);
         $insert_id = $wpdb->insert_id;
         $result = array(
-            'error' => true,
+            'error' => false,
             'message' => $insert_id
         );
         wp_send_json($result);

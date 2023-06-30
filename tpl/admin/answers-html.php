@@ -1,4 +1,12 @@
 <style>
+    .verified {
+        color: green;
+    }
+
+    .unverified {
+        color: grey;
+    }
+
     td {
         padding: 15px !important;
     }
@@ -50,29 +58,26 @@
         margin: 0px !important;
     }
 
-    #all-quiz_paginate .disabled {
+    #answers_paginate .disabled {
         color: #c0c0c0 !important;
     }
 
-    #all-quiz_length select {
+    #answers_length select {
         min-width: 50px;
     }
 </style>
 <script src="https://cdn.tailwindcss.com"></script>
 
 
-<div class="w-full my-6">
-    <a class="bg-green-600 text-white px-4 py-3 rounded" href="?page=degardc-quiz-builder-new">ساخت آزمون جدید</a>
-</div>
 <div class="bg-white ml-5 py-5 px-10 rounded">
     <form action="" method="GET">
-        <table id="all-quiz" class="w-full cell-border stripe nowrap" style="width: 100%;">
+        <table id="answers" class="w-full cell-border stripe nowrap" style="width: 100%;">
             <thead>
                 <tr>
                     <th style="text-align: right;">آزمون</th>
-                    <th style="text-align: right;">کد کوتاه</th>
-                    <th style="text-align: right;">شرکت کنندگان</th>
-                    <th style="text-align: right;">ویرایش</th>
+                    <th style="text-align: right;">نام و نام خانوادگی</th>
+                    <th style="text-align: right;">شماره تماس</th>
+                    <th style="text-align: right;">نمره</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,17 +87,15 @@
                             <?= json_decode($result->options)->name ?>
                         </td>
                         <td>
-                            [degardc_quiz_builder id=<?= $result->id ?>]
+                            نامشخص
                         </td>
                         <td>
-                            <a href="?page=degardc-quiz-builder-answers&id=<?= $result->id ?>" class="bg-green-700 rounded px-4 py-2 text-white cursor-pointer border-none no-underline hover:text-white">
-                                مشاهده
-                            </a>
+                            <span class="<?= $result->is_verified ? "verified" : "unverified" ?>">
+                                <?= $result->mobile_number ? (strlen($result->mobile_number) > 11 ? json_decode($result->mobile_number)->number : $result->mobile_number) : "نامشخص" ?>
+                            </span>
                         </td>
                         <td>
-                            <a href="?page=degardc-quiz-builder-new&id=<?= $result->id ?>" class="bg-blue-600 rounded px-4 py-2 text-white cursor-pointer border-none no-underline hover:text-white">
-                                ویرایش
-                            </a>
+                            <?= json_decode($result->result)->totalScore . " %" ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -103,7 +106,8 @@
 
 <script>
     setTimeout(function() {
-        let table = new DataTable('#all-quiz', {
+        let table = new DataTable('#answers', {
+            pageLength: 25,
             scrollX: true,
             pagingType: "full_numbers",
             language: {

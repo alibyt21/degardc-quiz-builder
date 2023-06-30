@@ -1,4 +1,9 @@
+let biggestQuestionId = 0;
+
+const loaderHTML = '<div class="loading-circle"></div>';
+
 const DEFAULT_QUESTION_OBJECT = {
+    id: "",
     name: "",
     description: "",
     answers: [],
@@ -11,11 +16,30 @@ const DEFAULT_ANSWER_OBJECT = {
     isCorrect: false,
 };
 
+const DEFAULT_RESULT_MESSAGE_OBJECT = {
+    min: "",
+    max: "",
+    message: "",
+};
+
 let state = {
+    group: "",
     name: "",
     description: "",
+    resultMessage: [],
     questions: [],
-    settings: {},
+    childs: [],
+    settings: {
+        requireScore: 70,
+        collectParticipantName: false,
+        collectMobileNumber: false,
+        validateMobileNumber: false,
+        registerOnSite: false,
+        seprateResult: false,
+        showResult: false,
+        bookAnAppointment: false,
+        oneAttempt: false,
+    },
 };
 
 let clonedEmptyQuestion = document
@@ -24,8 +48,49 @@ let clonedEmptyQuestion = document
 let clonedEmptyAnswer = document
     .querySelector(".single-answer")
     .cloneNode(true);
+let clonedEmptyResultMessage = document
+    .querySelector(".single-resultMessage")
+    .cloneNode(true);
 
 /* START helper functions */
+function end_loading_animation(buttonNode, buttonPrevText) {
+    buttonNode.innerHTML = buttonPrevText;
+}
+function start_loading_animation(buttonNode) {
+    let buttonPrevText = buttonNode.innerHTML;
+    buttonNode.innerHTML = loaderHTML;
+    return buttonPrevText;
+}
+
+function show_notif(text, type = "alert") {
+    let color;
+    switch (type) {
+        case "alert":
+            color = "#333333";
+            break;
+        case "error":
+            color = "#fe597b";
+            break;
+        case "success":
+            color = "#1aae50";
+            break;
+    }
+    Toastify({
+        text,
+        duration: 5000,
+        close: false,
+        gravity: "bottom", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover,
+        escapeMarkup: false,
+        style: {
+            background: color,
+            borderRadius: "10px",
+            boxShadow: "0 3px 6px 0px rgba(0,0,0,.06)",
+            userSelect: "none",
+        },
+    }).showToast();
+}
 function find_related_parent_by_className(node, className) {
     let isFindParent = false;
     let parent = node;
@@ -49,12 +114,60 @@ function find_related_parent_by_className(node, className) {
         return false;
     }
 }
+async function postData(
+    url = "",
+    urlParameters = {},
+    data = {},
+    headers = {
+        "Content-Type": "application/json",
+    }
+) {
+    try {
+        // Default options are marked with *
+        const response = await fetch(
+            url + "?" + new URLSearchParams(urlParameters),
+            {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers,
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data), // body data type must match "Content-Type" header
+            }
+        );
+        return response.json(); // parses JSON response into native JavaScript objects
+    } catch (error) {
+        show_notif(
+            "در ارسال اطلاعات خطایی رخ داده است، لطفا چند دقیقه دیگر مجددا امتحان کنید"
+        );
+    }
+}
+async function getData(
+    url = "",
+    urlParameters = {},
+    headers = {
+        "Content-Type": "application/json",
+    }
+) {
+    const response = await fetch(
+        url + "?" + new URLSearchParams(urlParameters),
+        {
+            method: "GET",
+            headers: new Headers(headers),
+            mode: "cors",
+        }
+    );
+    return response.json(); // parses JSON response into native JavaScript objects
+}
 /* END helper functions */
 
 /* START sync state to view */
 function sync_state_to_view(state) {
     sync_quiz_info_to_view(state);
     sync_questions_to_view(state);
+    sync_result_messages_to_view(state);
 }
 
 function sync_quiz_info_to_view(state) {
@@ -69,7 +182,18 @@ function sync_quiz_info_to_view(state) {
     quizDescription.value = state.description;
 
     // sync settings
-    // TODO
+    document.querySelector(".quiz-settings-registerOnSite").checked =
+        state.settings.registerOnSite;
+    document.querySelector(".quiz-settings-collectMobileNumber").checked =
+        state.settings.collectMobileNumber;
+    document.querySelector(".quiz-settings-validateMobileNumber").checked =
+        state.settings.validateMobileNumber;
+    document.querySelector(".quiz-settings-collectParticipantName").checked =
+        state.settings.collectParticipantName;
+    document.querySelector(".quiz-settings-showResult").checked =
+        state.settings.showResult;
+    document.querySelector(".quiz-settings-oneAttempt").checked =
+        state.settings.oneAttempt;
 }
 
 function sync_questions_to_view(state) {
@@ -126,6 +250,23 @@ function sync_answers_of_a_single_question(answers, questionDOM) {
         answersContainer.appendChild(newAnswer);
     });
 }
+
+function sync_result_messages_to_view(state) {
+    let resultMessageContainer = document.querySelector(
+        ".resultMessage-container"
+    );
+    resultMessageContainer.innerHTML = null;
+    state.resultMessage.forEach(function (singleResultMessage) {
+        let newResultMessage = clonedEmptyResultMessage.cloneNode(true);
+        newResultMessage.querySelector(".resultMessage-lower-bundle").value =
+            singleResultMessage.min;
+        newResultMessage.querySelector(".resultMessage-upper-bundle").value =
+            singleResultMessage.max;
+        newResultMessage.querySelector(".resultMessage-message").innerHTML =
+            singleResultMessage.message;
+        resultMessageContainer.appendChild(newResultMessage);
+    });
+}
 /* END sync state to view */
 
 /* START sync view to state */
@@ -139,9 +280,34 @@ function change_quiz_state(state, newQuizState) {
         newQuizState.description || newQuizState.description == ""
             ? newQuizState.description
             : prevState.description;
-    state.settings = newQuizState.settings || prevState.settings;
+    if (newQuizState.settings) {
+        for (var key of Object.keys(newQuizState.settings)) {
+            state.settings[key] = newQuizState.settings[key];
+        }
+    }
 }
 
+function change_result_message_state_by_result_message_index(
+    state,
+    resultMessageIndex,
+    newResultMessageState
+) {
+    let prevState = state.resultMessage[resultMessageIndex];
+    state.resultMessage[resultMessageIndex] = {
+        min:
+            newResultMessageState.min || newResultMessageState.min == ""
+                ? newResultMessageState.min
+                : prevState.min,
+        max:
+            newResultMessageState.max || newResultMessageState.max == ""
+                ? newResultMessageState.max
+                : prevState.max,
+        message:
+            newResultMessageState.message || newResultMessageState.message == ""
+                ? newResultMessageState.message
+                : prevState.message,
+    };
+}
 function change_question_state_by_question_index(
     state,
     questionIndex,
@@ -149,6 +315,7 @@ function change_question_state_by_question_index(
 ) {
     let prevState = state.questions[questionIndex];
     state.questions[questionIndex] = {
+        id: prevState.id,
         name:
             newQuestionState.name || newQuestionState.name == ""
                 ? newQuestionState.name
@@ -186,9 +353,21 @@ function change_answer_state_by_question_and_answer_index(
     return;
 }
 
+function add_new_result_message(state) {
+    let cloned = JSON.parse(JSON.stringify(DEFAULT_RESULT_MESSAGE_OBJECT));
+    state.resultMessage.push(cloned);
+}
+
 function add_new_question(state) {
+    calculate_biggest_question_id();
     let cloned = JSON.parse(JSON.stringify(DEFAULT_QUESTION_OBJECT));
+    // increase question id in add
+    cloned.id = +biggestQuestionId + 1;
     state.questions.push(cloned);
+}
+
+function delete_result_message_by_index(state, resultMessageIndex) {
+    state.resultMessage.splice(resultMessageIndex, 1);
 }
 
 function delete_question_by_index(state, questionIndex) {
@@ -209,7 +388,7 @@ function delete_answer_by_question_and_answer_index(
 }
 
 let quizContainer = document.getElementById("quiz-container");
-quizContainer.addEventListener("change", function (e) {
+quizContainer.addEventListener("change", async function (e) {
     if (e.target.className.includes("quiz")) {
         // related to quiz
         if (e.target.className.includes("quiz-name")) {
@@ -219,6 +398,13 @@ quizContainer.addEventListener("change", function (e) {
         } else if (e.target.className.includes("quiz-description")) {
             change_quiz_state(state, {
                 description: e.target.value,
+            });
+        } else if (e.target.className.includes("quiz-settings")) {
+            let key = e.target.className.replace("quiz-settings-", "");
+            change_quiz_state(state, {
+                settings: {
+                    [key]: e.target.checked,
+                },
             });
         }
     } else if (e.target.className.includes("question")) {
@@ -285,10 +471,44 @@ quizContainer.addEventListener("change", function (e) {
                 }
             );
         }
+    } else if (e.target.className.includes("resultMessage")) {
+        // related to resultMessage
+        // find related resultMessage
+        let singleResultMessage = find_related_parent_by_className(
+            e.target,
+            "single-resultMessage"
+        );
+        let resultMessageIndex = Array.from(
+            singleResultMessage.parentElement.children
+        ).indexOf(singleResultMessage);
+        if (e.target.className.includes("resultMessage-lower-bundle")) {
+            change_result_message_state_by_result_message_index(
+                state,
+                resultMessageIndex,
+                {
+                    min: e.target.value,
+                }
+            );
+        } else if (e.target.className.includes("resultMessage-upper-bundle")) {
+            change_result_message_state_by_result_message_index(
+                state,
+                resultMessageIndex,
+                {
+                    max: e.target.value,
+                }
+            );
+        } else if (e.target.className.includes("resultMessage-message")) {
+            change_result_message_state_by_result_message_index(
+                state,
+                resultMessageIndex,
+                {
+                    message: e.target.value,
+                }
+            );
+        }
     }
-    save_data_to_db(state);
 });
-quizContainer.addEventListener("click", function (e) {
+quizContainer.addEventListener("click", async function (e) {
     if (find_related_parent_by_className(e.target, "delete")) {
         // delete something
         if (find_related_parent_by_className(e.target, "delete-question")) {
@@ -324,6 +544,18 @@ quizContainer.addEventListener("click", function (e) {
                 questionIndex,
                 answerIndex
             );
+        } else if (
+            find_related_parent_by_className(e.target, "delete-resultMessage")
+        ) {
+            // delete resultMessage
+            let relatedResultMessage = find_related_parent_by_className(
+                e.target,
+                "single-resultMessage"
+            );
+            let resultMessageIndex = Array.from(
+                relatedResultMessage.parentElement.children
+            ).indexOf(relatedResultMessage);
+            delete_result_message_by_index(state, resultMessageIndex);
         }
         sync_state_to_view(state);
     } else if (find_related_parent_by_className(e.target, "add")) {
@@ -343,84 +575,103 @@ quizContainer.addEventListener("click", function (e) {
                 relatedQuestion.parentElement.children
             ).indexOf(relatedQuestion);
             add_new_answer_by_question_index(state, questionIndex);
+        } else if (
+            find_related_parent_by_className(e.target, "add-new-resultMessage")
+        ) {
+            // add new result message
+            add_new_result_message(state);
         }
         sync_state_to_view(state);
     }
-    save_data_to_db(state);
 });
 /* END sync view to state */
 
-setInterval(function () {
-    console.log(state);
-}, 2000);
+/* START save changes */
+let saveChanges = document.getElementById("save-changes");
+saveChanges.addEventListener("click", async function (e) {
+    let buttonPrevText = start_loading_animation(e.target);
+    await save_data_to_db(state);
+    console.log("injjja");
+    end_loading_animation(e.target, buttonPrevText);
+});
+/* START save changes */
+function end_loading_page_animation() {
+    document.querySelector(".loading").style.display = "none";
+    document.querySelector(".loaded").style.filter = "none";
+}
 
-sync_state_to_view(state);
-
-let urlParams = new URLSearchParams(window.location.search);
-let id = urlParams.get("id") ? urlParams.get("id") : null;
-let firstTry = true;
-
-function get_init_state() {
-    if (!id) {
+async function get_init_state() {
+    if (!state.group) {
+        end_loading_page_animation();
         return;
     }
-    fetch(
-        degardc_quiz_builder_ajax_object.ajax_url +
-            "?" +
-            new URLSearchParams({
-                action: "degardc_quiz_builder_get_quiz_data_ajax",
-                id,
-            }),
-        {
-            method: "POST",
-            credentials: "same-origin",
-        }
-    )
-        .then((response) => response.json())
-        .then((data) => {
-            state = JSON.parse(data.message);
-            sync_state_to_view(state);
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+    const response = await getData(degardc_quiz_builder_ajax_object.ajax_url, {
+        action: "degardc_quiz_builder_get_quiz_data_ajax",
+        id: state.group,
+    });
+    state = JSON.parse(response.message);
+    sync_state_to_view(state);
+    end_loading_page_animation();
 }
-get_init_state();
 
-function save_data_to_db(state) {
+function calculate_biggest_question_id() {
+    state.questions.forEach(function (single) {
+        if (single.id > biggestQuestionId) {
+            biggestQuestionId = single.id;
+        }
+    });
+}
+
+async function save_data_to_db(state) {
     // we send id in update and null in insert
-    if (id) {
+    if (state.group) {
         // update
-        send_state_to_back_end((mode = "update"));
+        await send_state_to_back_end((mode = "update"));
     } else {
         // insert
-        if (firstTry) {
-            firstTry = false;
-            send_state_to_back_end((mode = "insert"));
-        }
+        await send_state_to_back_end((mode = "insert"));
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get("page");
+        window.history.replaceState(
+            ``,
+            `آزمون جدید ${state.name}`,
+            `admin.php?page=${page}&id=${state.group}`
+        );
     }
 }
 
-function send_state_to_back_end(mode = "update") {
-    let apiURL =
-        degardc_quiz_builder_ajax_object.ajax_url +
-        "?" +
-        new URLSearchParams({
-            action: "degardc_quiz_builder_save_quiz_data_ajax",
-            id,
-        });
-    fetch(apiURL, {
-        method: "POST",
-        credentials: "same-origin",
-        body: JSON.stringify(state),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            if (mode == "insert") {
-                id = data.message;
-            }
-        })
-        .catch((error) => {
-            console.error(error);
-        });
+async function send_state_to_back_end(mode = "update") {
+    try {
+        let response = await postData(
+            degardc_quiz_builder_ajax_object.ajax_url,
+            {
+                action: "degardc_quiz_builder_save_quiz_data_ajax",
+                id: state.group,
+            },
+            state
+        );
+        if (mode == "insert") {
+            state.group = response.message;
+            // now we have quiz id in db and set it in state and resend it to backend to save quiz info with group id
+            await postData(
+                degardc_quiz_builder_ajax_object.ajax_url,
+                {
+                    action: "degardc_quiz_builder_save_quiz_data_ajax",
+                    id: state.group,
+                },
+                state
+            );
+        }
+        show_notif("تغییرات شما با موفقیت ذخیره شد", "success");
+    } catch (error) {}
 }
+
+(async function init() {
+    sync_state_to_view(state);
+    let urlParams = new URLSearchParams(window.location.search);
+    state.group = urlParams.get("id") ? urlParams.get("id") : null;
+    await get_init_state();
+    setInterval(function () {
+        console.log(state);
+    }, 2000);
+})();
