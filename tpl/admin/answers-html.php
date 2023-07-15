@@ -87,7 +87,7 @@
                             <?= json_decode($result->options)->name ?>
                         </td>
                         <td>
-                            نامشخص
+                            <?= $result->mobile_number ? json_decode($result->extra_info)->{'participant-firstname'} . " " . json_decode($result->extra_info)->{'participant-lastname'} : "نامشخص" ?>
                         </td>
                         <td>
                             <span class="<?= $result->is_verified ? "verified" : "unverified" ?>">

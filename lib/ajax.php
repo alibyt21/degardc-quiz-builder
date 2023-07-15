@@ -109,8 +109,8 @@ function degardc_quiz_builder_send_validation_code_ajax()
 
     $random_number = rand(10000, 99999);
     /* return int in success */
-    // $response = faraz_sms_pattern("qncer227zn", array($mobile_number), array("verification-code" => $random_number));
-    if (!true) {
+    $response = faraz_sms_pattern("qncer227zn", array($mobile_number), array("verification-code" => $random_number));
+    if (!is_numeric($response)) {
         $result = array(
             'error' => true,
             'message' => 'در ارسال پیامک خطایی رخ داده است، لطفا به پشتیبانی اطلاع دهید',
@@ -404,6 +404,32 @@ function degardc_quiz_builder_login_with_one_time_password()
 add_action('wp_ajax_degardc_quiz_builder_login_with_one_time_password', 'degardc_quiz_builder_login_with_one_time_password');
 add_action('wp_ajax_nopriv_degardc_quiz_builder_login_with_one_time_password', 'degardc_quiz_builder_login_with_one_time_password');
 
+
+function degardc_quiz_builder_save_extra_info(){
+    $inserted_id = sanitize_text_field($_POST['insertedId']);
+    $extra_info = stripslashes(sanitize_text_field($_POST['extraInfo']));
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'degardcquiz_answers';
+    $data = array('extra_info' => $extra_info);
+    $where = array('id' => $inserted_id);
+    $db_result = $wpdb->update($table, $data, $where);
+    if (!$db_result) {
+        $result = array(
+            'error' => true,
+            'message' => "خطایی رخ داده است، کد خطا: 29",
+        );
+        wp_send_json($result);
+    }
+    $result = array(
+        'error' => false,
+        'message' =>  "اطلاعات با موفقیت اضافه شدند",
+    );
+    wp_send_json($result);
+    die();
+}
+add_action('wp_ajax_degardc_quiz_builder_save_extra_info', 'degardc_quiz_builder_save_extra_info');
+add_action('wp_ajax_nopriv_degardc_quiz_builder_save_extra_info', 'degardc_quiz_builder_save_extra_info');
 
 
 function degardc_quiz_builder_login_if_exists_register_if_new()

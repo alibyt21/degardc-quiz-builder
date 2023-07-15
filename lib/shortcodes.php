@@ -96,7 +96,7 @@ function degardc_quiz_builder_callback($atts)
                         </h1>
                     </div>
                     <div class="flex flex-row w-full justify-between p-3 rounded-xl border my-2 border-solid border-gray-300">
-                        <input class="flex-auto w-2/3 focus-visible:outline-none" id="mobile-number" pattern="[0]{1}[9]{1}[0-9]{9}" type="number" minlength="10" maxlength="11" placeholder="شماره موبایل خود را وارد کنید" />
+                        <input id="mobile-number" class="flex-auto w-2/3 focus-visible:outline-none" pattern="[0]{1}[9]{1}[0-9]{9}" type="number" minlength="10" maxlength="11" placeholder="شماره موبایل خود را وارد کنید" />
                         <div class="flex flex-row items-center" id='flag'>
                             <div class="border-l mx-2"></div>
                             <span class="ml-2">98+</span>

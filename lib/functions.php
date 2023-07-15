@@ -12,6 +12,7 @@ if (!function_exists('faraz_sms_pattern')) {
         return $response;
     }
 }
+
 if (!function_exists('is_mobile_number_valid_in_iran')) {
     function is_mobile_number_valid_in_iran($mobile_number)
     {
@@ -23,20 +24,3 @@ if (!function_exists('is_mobile_number_valid_in_iran')) {
     }
 }
 
-
-function senddata($array)
-{
-
-    $ch = curl_init('https://charkhdande.com/landing/log.php');
-    # Setup request to send json via POST.
-    $payload = json_encode($array);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-    # Return response instead of printing.
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    # Send request.
-    $result = curl_exec($ch);
-    curl_close($ch);
-    # Print response.
-
-}

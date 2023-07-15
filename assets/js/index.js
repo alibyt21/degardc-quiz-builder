@@ -376,7 +376,6 @@ function limit_to_result_page() {
 }
 
 function create_result() {
-    console.log("dare amade mishe");
     document.querySelector(".result").style.visibility = "visible";
     document.querySelector(".result").style.opacity = "1";
     // set quiz to finished
@@ -482,7 +481,6 @@ function get_quiz_sub_data_by_quiz_group(quizData, group) {
     }
 }
 function update_quiz_result(group, score, questionCount) {
-    console.log("lets hoooo");
     let sum = 0;
     let questionCountTotal = 0;
     if (!quizResult.groupResult[group]) {
@@ -499,7 +497,7 @@ function update_quiz_result(group, score, questionCount) {
         questionCountTotal =
             questionCountTotal + quizResult.groupResult[key].questionCount;
     }
-    quizResult.totalScore = (sum / questionCountTotal).toFixed(2) ;
+    quizResult.totalScore = (sum / questionCountTotal).toFixed(2);
     // we can add weight to every single quiz group and make weighted average
 }
 
@@ -598,13 +596,24 @@ function exam_is_ready_to_start() {
             } else if (
                 singleNextButton.classList.contains("register-validate-button")
             ) {
+                // common
                 let inputs = document
                     .querySelector(".register-validate")
                     .querySelectorAll("input");
+
+                // send extra info
+                let extraInfo = get_a_section_and_extract_extra_inputs(
+                    document.querySelector(".register-validate")
+                );
+                handle_request_to_save_extra_info(extraInfo);
+                    console.log(participantData);
+                    console.log(extraInfo);
+
                 if (quizData.settings.collectMobileNumber) {
                     var mobileNumber =
                         document.getElementById("mobile-number").value;
                 }
+
                 if (
                     quizData.settings.registerOnSite &&
                     quizData.settings.validateMobileNumber
@@ -769,7 +778,6 @@ function exam_is_ready_to_start() {
         validationCode,
         mobileNumber
     ) {
-        console.log("injam");
         try {
             let response = await request_to_api({
                 action: "degardc_quiz_builder_check_validation_code",
@@ -867,6 +875,25 @@ function exam_is_ready_to_start() {
                     throw new Error();
                 }
             }
+        }
+    }
+
+    async function handle_request_to_save_extra_info(extraInfo) {
+        if (insertedId == -1) {
+            setTimeout(() => {
+                handle_request_to_save_extra_info(extraInfo);
+            }, 1000);
+            return;
+        }
+        // send request to save extra information about participant
+        try {
+            let response = await request_to_api({
+                action: "degardc_quiz_builder_save_extra_info",
+                insertedId,
+                extraInfo : JSON.stringify(extraInfo),
+            });
+        } catch (error) {
+            throw new Error();
         }
     }
 
@@ -1323,7 +1350,6 @@ function exam_is_ready_to_start() {
         participantData = null
     ) {
         let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
-        console.log(singleQuizData);
         let questionCount = singleQuizData.questions.length;
         let groupScore = 0;
         participantData.forEach(function (singleAnswer) {
@@ -1425,9 +1451,9 @@ function exam_is_ready_to_start() {
             .querySelector("h1").innerHTML = "ورود با کد یکبار مصرف";
     }
 
-    setInterval(function () {
-        console.log(quizResult);
-    }, 2000);
+    // setInterval(function () {
+    //     console.log(quizResult);
+    // }, 2000);
 }
 
 /* START helper functions */
@@ -1447,6 +1473,28 @@ async function getData(
         }
     );
     return response.json(); // parses JSON response into native JavaScript objects
+}
+
+function get_a_section_and_extract_extra_inputs(element) {
+    let whiteList = [
+        "participant-email",
+        "participant-password",
+        "validation-code",
+        "mobile-number",
+    ];
+    let inputs = element.querySelectorAll("input");
+    let inputsArray = {};
+    inputs.forEach(function (singleInput) {
+        if (whiteList.includes(singleInput.id)) {
+            return;
+        }
+        if (singleInput.id) {
+            inputsArray[singleInput.id] = singleInput.value;
+        } else if (singleInput.name) {
+            inputsArray[singleInput.name] = singleInput.value;
+        }
+    });
+    return inputsArray;
 }
 
 function get_node_index(element) {
