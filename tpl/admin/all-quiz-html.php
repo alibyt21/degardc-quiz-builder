@@ -71,6 +71,7 @@
                 <tr>
                     <th style="text-align: right;">آزمون</th>
                     <th style="text-align: right;">کد کوتاه</th>
+                    <th style="text-align: right;">تاریخ ایجاد</th>
                     <th style="text-align: right;">شرکت کنندگان</th>
                     <th style="text-align: right;">ویرایش</th>
                 </tr>
@@ -83,6 +84,9 @@
                         </td>
                         <td>
                             [degardc_quiz_builder id=<?= $result->id ?>]
+                        </td>
+                        <td>
+                            <?= int_time_to_jalali_date(strtotime($result->created_at), 1) ?>
                         </td>
                         <td>
                             <a href="?page=degardc-quiz-builder-answers&id=<?= $result->id ?>" class="bg-green-700 rounded px-4 py-2 text-white cursor-pointer border-none no-underline hover:text-white">
