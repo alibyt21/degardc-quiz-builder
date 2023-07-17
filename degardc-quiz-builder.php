@@ -48,6 +48,7 @@ function degardc_quiz_builder_create_db_table()
       answer text(4095),
       result text(4095),
       extra_info text(4095),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY id (id)
     ) $charset_collate;";
 

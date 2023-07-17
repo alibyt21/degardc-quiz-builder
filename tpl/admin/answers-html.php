@@ -78,6 +78,7 @@
                     <th style="text-align: right;">نام و نام خانوادگی</th>
                     <th style="text-align: right;">شماره تماس</th>
                     <th style="text-align: right;">نمره</th>
+                    <th style="text-align: right;">تاریخ ایجاد</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,6 +97,9 @@
                         </td>
                         <td>
                             <?= json_decode($result->result)->totalScore . " %" ?>
+                        </td>
+                        <td>
+                            <?= int_time_to_jalali_date(strtotime($result->created_at),1) ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
