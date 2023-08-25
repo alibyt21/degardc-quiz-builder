@@ -454,7 +454,7 @@ path.blue {
 /*end ticket*/
 
 
-.quiz-description{
+.quiz-description {
     direction: rtl;
 }
 
@@ -504,8 +504,8 @@ path.blue {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 20px;
-    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
     border: 1px solid #cccccc;
     border-radius: 100%;
     margin-left: 10px;
@@ -683,6 +683,10 @@ path.blue {
 
 .h-screen {
     height: 100vh;
+}
+
+.min-h-screen {
+    min-height: 100vh;
 }
 
 .h-\[63px\] {

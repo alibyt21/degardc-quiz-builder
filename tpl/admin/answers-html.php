@@ -88,7 +88,7 @@
                             <?= json_decode($result->options)->name ?>
                         </td>
                         <td>
-                            <?= $result->mobile_number ? json_decode($result->extra_info)->{'participant-firstname'} . " " . json_decode($result->extra_info)->{'participant-lastname'} : "نامشخص" ?>
+                            <?= $result->extra_info ? json_decode($result->extra_info)->{'participant-firstname'} . " " . json_decode($result->extra_info)->{'participant-lastname'} : "نامشخص" ?>
                         </td>
                         <td>
                             <span class="<?= $result->is_verified ? "verified" : "unverified" ?>">
@@ -99,7 +99,7 @@
                             <?= json_decode($result->result)->totalScore . " %" ?>
                         </td>
                         <td>
-                            <?= int_time_to_jalali_date(strtotime($result->created_at),1) ?>
+                            <?= int_time_to_jalali_date(strtotime($result->created_at), 1) ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -111,6 +111,9 @@
 <script>
     setTimeout(function() {
         let table = new DataTable('#answers', {
+            order: [
+                [4, 'desc']
+            ],
             pageLength: 25,
             scrollX: true,
             pagingType: "full_numbers",

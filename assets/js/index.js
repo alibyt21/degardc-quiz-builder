@@ -407,7 +407,7 @@ function create_result() {
 }
 function make_result_message(totalScore) {
     quizData.resultMessage.forEach(function (single) {
-        if (totalScore >= single.min && totalScore <= single.max) {
+        if (+single.min <= +totalScore  && +totalScore <= +single.max) {
             document.querySelector(".result-message").innerHTML =
                 single.message || "";
         }

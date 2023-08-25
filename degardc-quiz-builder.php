@@ -115,9 +115,9 @@ function degardc_quiz_builder_answers_page()
     $answer_table_name = $wpdb->prefix . DEGARDC_ANSWER_TABLE;
     $quiz_table_name = $wpdb->prefix . DEGARDC_QUIZ_TABLE;
     if ($quiz_id) {
-        $results = $wpdb->get_results("SELECT * FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id WHERE quiz_id = $quiz_id");
+        $results = $wpdb->get_results("SELECT $answer_table_name.* , $quiz_table_name.options FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id WHERE quiz_id = $quiz_id");
     } else {
-        $results = $wpdb->get_results("SELECT * FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id");
+        $results = $wpdb->get_results("SELECT $answer_table_name.* , $quiz_table_name.options FROM $answer_table_name INNER JOIN $quiz_table_name ON $answer_table_name.quiz_id = $quiz_table_name.id");
     }
     include DEGARDC_QUIZ_BUILDER_PATH . '/tpl/admin/answers-html.php';
 }

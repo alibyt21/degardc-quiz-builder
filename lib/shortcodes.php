@@ -42,7 +42,7 @@ function degardc_quiz_builder_callback($atts)
                 </div>
             </div>
         </div>
-        <div class="quiz flex dg-main-container overflow-hidden relative flex-col justify-center items-center px-2 w-full h-screen my-6" style="display: none;">
+        <div class="quiz flex dg-main-container overflow-hidden relative flex-col justify-center items-center px-2 w-full min-h-screen my-6" style="display: none;">
             <div class="dg-step-card dg-entrance-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out flex items-center">
                 <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
                     <div class="mx-auto w-full text-center">
