@@ -514,10 +514,11 @@ function degardc_quiz_builder_izaban()
     $mobileNumber = sanitize_text_field($_POST['mobileNumber']);
     $quizType = sanitize_text_field($_POST['quizType']);
     $time = sanitize_text_field($_POST['time']);
+    $date = sanitize_text_field($_POST['date']);
     $score = sanitize_text_field($_POST['score']);
     $quizname = sanitize_text_field($_POST['quizname']);
-    $response1 = faraz_sms_pattern("tb36z6ui0f5nnjp", array("09356126747"), array("quiztype" => $quizType, "mobile" => $mobileNumber, 'time' => $time, 'score' => $score, 'quizname' => $quizname));
-    $response2 = faraz_sms_pattern("t5haui1w9h6whbk", array($mobileNumber), array("fullname" => $fullname, "quiztype" => $quizType, 'time' => $time));
+    $response1 = faraz_sms_pattern("tb36z6ui0f5nnjp", array("09100022496"), array("quiztype" => $quizType, "mobile" => $mobileNumber, 'time' => $date . " " . $time, 'score' => $score . "%", 'quizname' => $quizname));
+    $response2 = faraz_sms_pattern("t5haui1w9h6whbk", array($mobileNumber), array("fullname" => $fullname, "quiztype" => $quizType, 'time' => $date . " " . $time));
 }
 add_action('wp_ajax_degardc_quiz_builder_izaban', 'degardc_quiz_builder_izaban');
 add_action('wp_ajax_nopriv_degardc_quiz_builder_izaban', 'degardc_quiz_builder_izaban');

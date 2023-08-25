@@ -177,8 +177,18 @@ function degardc_quiz_builder_callback($atts)
                     <div class="question text-2xl my-5 mb-7">
                         نوع آزمون شفاهی تعیین سطح خود را مشخص کنید
                     </div>
-                    <div class="p-4 border border-solid border-gray-300 rounded-xl my-6">
-                        <input type="text" id="book-time" class="date-picker w-full" />
+                    <div class="w-full">
+                        <span class="w-full text-center">
+                            ساعت کاری آموزشگاه از ساعت 10 صبح تا 9 شب است.
+                        </span>
+                    </div>
+                    <div class="w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2">
+                        <div class="w-full p-4 border border-solid border-gray-300 rounded-xl my-6">
+                            <input type="text" id="book-date" class="date-picker w-full" />
+                        </div>
+                        <div class="w-full p-4 border border-solid border-gray-300 rounded-xl my-6">
+                            <input type="text" id="book-time" class="date-picker w-full" />
+                        </div>
                     </div>
                     <div class="answer-block w-full grid grid-cols-1 gap-3 lg:gap-5 lg:grid-cols-2" data-qtype="single-option" data-qid="book" data-qgroup="book">
                         <div class="option">
@@ -228,7 +238,7 @@ function degardc_quiz_builder_callback($atts)
                     <div class="result-message text-gray-500 text-center"></div>
                 </div>
                 <div class="dg-seprate-results w-full">
-                    <div class="dg-single-result flex flex-row items-center justify-between bg-white rounded-xl w-full p-4 px-6 my-2">
+                    <div class="dg-single-result flex flex-row items-center justify-between bg-white rounded-xl w-full p-3 px-6">
                         <div class="flex flex-col">
                             <div class="dg-single-result-name text-gray-600"></div>
                             <div class="dg-single-result-description text-sm text-gray-400"></div>
@@ -353,23 +363,23 @@ function degardc_quiz_builder_callback($atts)
                     'oneAttempt': !![]
                 },
                 'questions': [{
-                    'id': 0x1,
-                    'name': _0x3ed56d(0x198),
+                    'id': 1,
+                    'name': "l- ---, ۲, ۳, ---, ---",
                     'description': '',
                     'answers': [{
-                        'name': _0x3ed56d(0x333),
+                        'name': "a.	1, 4, 5",
                         'priority': '',
                         'isCorrect': !![]
                     }, {
-                        'name': _0x3ed56d(0x1b9),
+                        'name': "b. 1, 5, 6",
                         'priority': '',
                         'isCorrect': ![]
                     }, {
-                        'name': '4,\x205,\x206',
+                        'name': "c. 4, 5, 6",
                         'priority': '',
                         'isCorrect': ![]
                     }, {
-                        'name': _0x3ed56d(0x1f5),
+                        'name': "d. 1, 3, 5",
                         'priority': '',
                         'isCorrect': ![]
                     }]
@@ -753,7 +763,7 @@ function degardc_quiz_builder_callback($atts)
                     }]
                 }, {
                     'id': 0x14,
-                    'name': _0x3ed56d(0x26d),
+                    'name': "20- a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, ---, ---, ---, ---, ---, ---, ---, z",
                     'description': '',
                     'answers': [{
                         'name': _0x3ed56d(0x223),
@@ -790,22 +800,22 @@ function degardc_quiz_builder_callback($atts)
                     },
                     'questions': [{
                         'id': 0x15,
-                        'name': _0x3ed56d(0x21a),
+                        'name': "۲l- ۱, ۲, ۳, ۴, ---, ---, ---, ---, ۹, ۱۰",
                         'description': '',
                         'answers': [{
-                            'name': '5,\x207,\x209,\x2011',
+                            'name': 'a. ۵, ۷, ۹, ۱۱',
                             'priority': '',
                             'isCorrect': ![]
                         }, {
-                            'name': _0x3ed56d(0x32f),
+                            'name': "b. ۵, ۶, ۷, ۹",
                             'priority': '',
                             'isCorrect': ![]
                         }, {
-                            'name': _0x3ed56d(0x1cf),
+                            'name': "c. ۵, ۶, ۸, ۷",
                             'priority': '',
                             'isCorrect': ![]
                         }, {
-                            'name': _0x3ed56d(0x21e),
+                            'name': "d. ۵, ۶, ۷, ۸",
                             'priority': '',
                             'isCorrect': !![]
                         }]
@@ -5561,7 +5571,7 @@ function degardc_quiz_builder_callback($atts)
                                 isCorrect: true
                             },
                             {
-                                name: "brothers' friends",
+                                name: "brothers' friend",
                                 priority: "",
                                 isCorrect: false
                             },

@@ -1,10 +1,21 @@
+String.prototype.toEnglishDigit = function () {
+  var find = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  var replace = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  var replaceString = this;
+  var regex;
+  for (var i = 0; i < find.length; i++) {
+    regex = new RegExp(find[i], "g");
+    replaceString = replaceString.replace(regex, replace[i]);
+  }
+  return replaceString;
+};
+
 // constants
 const QUESTION_TYPES = {
   type1: "single-option",
   type2: "multi-option",
 };
 const loaderHTML = '<div class="loading-circle"></div>';
-
 
 // variables
 let quizResult;
@@ -46,7 +57,8 @@ startExamButton.addEventListener("click", start_exam_button_animations);
 
 function create_multiple_choice_answer(singleAnswer) {
   let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
-  newAnswer.querySelector(".answer-name").innerHTML = singleAnswer.name;
+  newAnswer.querySelector(".answer-name").innerHTML =
+    singleAnswer.name.toEnglishDigit();
   return newAnswer;
 }
 function create_multiple_choice_question(singleQuestion, quizGroup) {
@@ -54,7 +66,8 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
   // answerBlock where answers add to it
   let answerBlock = newQuestion.querySelector(".answer-block");
   // sync question name with data
-  newQuestion.querySelector(".question-name").innerHTML = singleQuestion.name;
+  newQuestion.querySelector(".question-name").innerHTML =
+    singleQuestion.name.toEnglishDigit();
   // insert id into question
   answerBlock.dataset.qid = singleQuestion.id;
   // insert quiz group id into question
@@ -172,9 +185,9 @@ function init_before_exam_start() {
   set_transition_duration_before_exam_start();
   set_questions_opacity_to_zero_and_qnumber();
 
-  $(".date-picker").persianDatepicker({
+  $("#book-date").persianDatepicker({
     inline: false,
-    format: "LLLL",
+    format: "YYYY/MM/DD",
     viewMode: "day",
     initialValue: 1682970244916,
     minDate: Date(),
@@ -234,7 +247,7 @@ function init_before_exam_start() {
       },
     },
     timePicker: {
-      enabled: true,
+      enabled: false,
       step: 1,
       hour: {
         enabled: true,
@@ -265,6 +278,102 @@ function init_before_exam_start() {
       titleFormat: "YYYY",
     },
     responsive: true,
+  });
+
+  $("#book-time").persianDatepicker({
+    inline: false,
+    format: "HH:mm",
+    viewMode: "day",
+    initialValue: true,
+    autoClose: false,
+    position: "auto",
+    altFormat: "lll",
+    altField: "#altfieldExample",
+    onlyTimePicker: true,
+    onlySelectOnDate: false,
+    calendarType: "persian",
+    inputDelay: 800,
+    observer: false,
+    calendar: {
+      persian: {
+        locale: "fa",
+        showHint: true,
+        leapYearMode: "algorithmic",
+      },
+      gregorian: {
+        locale: "en",
+        showHint: true,
+      },
+    },
+    navigator: {
+      enabled: true,
+      scroll: {
+        enabled: true,
+      },
+      text: {
+        btnNextText: "<",
+        btnPrevText: ">",
+      },
+    },
+    toolbox: {
+      enabled: true,
+      calendarSwitch: {
+        enabled: true,
+        format: "MMMM",
+      },
+      todayButton: {
+        enabled: true,
+        text: {
+          fa: "امروز",
+          en: "Today",
+        },
+      },
+      submitButton: {
+        enabled: true,
+        text: {
+          fa: "تایید",
+          en: "Submit",
+        },
+      },
+      text: {
+        btnToday: "امروز",
+      },
+    },
+    timePicker: {
+      enabled: true,
+      step: "1",
+      hour: {
+        enabled: true,
+        step: null,
+      },
+      minute: {
+        enabled: true,
+        step: null,
+      },
+      second: {
+        enabled: false,
+        step: null,
+      },
+      meridian: {
+        enabled: true,
+      },
+    },
+    dayPicker: {
+      enabled: false,
+      titleFormat: "YYYY MMMM",
+    },
+    monthPicker: {
+      enabled: false,
+      titleFormat: "YYYY",
+    },
+    yearPicker: {
+      enabled: false,
+      titleFormat: "YYYY",
+    },
+    responsive: true,
+    checkDate: function (unix) {
+      return new persianDate(unix).hour() >= 10;
+    },
   });
 
   document.querySelector(".quiz").style.display = "flex";
@@ -461,7 +570,6 @@ function get_quiz_sub_data_by_quiz_group(quizData, group) {
   }
 }
 function update_quiz_result(group, score, questionCount) {
-  console.log("lets hoooo");
   let sum = 0;
   let questionCountTotal = 0;
   if (!quizResult.groupResult[group]) {
@@ -540,14 +648,15 @@ function exam_is_ready_to_start() {
             interval = count_down();
             let buttonPrevText = start_loading_animation(singleNextButton);
             try {
+              await handle_request_to_submit_answers();
               handle_request_to_send_validation_code_api(mobileNumber);
               isOneTimePassword =
                 await handle_request_to_check_if_is_mobile_number_validated_before(
                   mobileNumber
                 );
-              if (isOneTimePassword) {
-                switch_to_only_validate();
-              }
+              // if (isOneTimePassword) {
+              //   switch_to_only_validate();
+              // }
               go_to_next_step_animations(index);
             } catch (error) {}
             end_loading_animation(singleNextButton, buttonPrevText);
@@ -669,18 +778,20 @@ function exam_is_ready_to_start() {
             document.getElementById("participant-firstname").value +
             document.getElementById("participant-lastname").value;
         }
-        let quizType = "نامشخص";
+        let quizType = "تعیین سطح شفاهی حضوری";
         participantData.forEach(function (single) {
           if (single.quizGroup == "book") {
             quizType = single.answers[0].name;
           }
         });
+        let date = document.getElementById("book-date").value;
         let time = document.getElementById("book-time").value;
         try {
           await handle_request_to_izaban(
             fullname,
             mobileNumber,
             quizType,
+            date,
             time,
             quizResult.totalScore,
             quizData.name
@@ -709,6 +820,7 @@ function exam_is_ready_to_start() {
 
   /* START api functions */
   async function handle_request_to_send_validation_code_api(mobileNumber) {
+    console.log(mobileNumber);
     if (insertedId == -1) {
       setTimeout(() => {
         handle_request_to_send_validation_code_api(mobileNumber);
@@ -728,6 +840,7 @@ function exam_is_ready_to_start() {
         show_notif(response.message, "success");
       }
     } catch (error) {
+      console.log("khdata dar ersal sms");
       throw new Error();
     }
   }
@@ -930,6 +1043,7 @@ function exam_is_ready_to_start() {
     fullname,
     mobileNumber,
     quizType,
+    date,
     time,
     score,
     quizname
@@ -939,9 +1053,10 @@ function exam_is_ready_to_start() {
       fullname,
       mobileNumber,
       quizType,
+      date,
       time,
       score,
-      quizname
+      quizname,
     });
   }
   async function request_to_api(
@@ -1299,7 +1414,6 @@ function exam_is_ready_to_start() {
     participantData = null
   ) {
     let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, group);
-    console.log(singleQuizData);
     let questionCount = singleQuizData.questions.length;
     let groupScore = 0;
     participantData.forEach(function (singleAnswer) {
@@ -1400,9 +1514,9 @@ function exam_is_ready_to_start() {
       "ورود با کد یکبار مصرف";
   }
 
-  setInterval(function () {
-    console.log(quizResult);
-  }, 2000);
+  // setInterval(function () {
+  //   console.log(quizResult);
+  // }, 2000);
 }
 
 /* START helper functions */
