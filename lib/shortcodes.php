@@ -60,7 +60,7 @@ function degardc_quiz_builder_callback($atts)
 
             <div class="sample-multiple-choice-question dg-step-card dg-question-card bg-white shadow-lg absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] transition-all ease-in-out flex items-center">
                 <div class="dg-step-block max-h-[600px] overflow-auto p-5 md:p-7 lg:p-10 w-full overflow-y-visible rounded-xl">
-                    <div class="text-gray-400">
+                    <div class="question-description text-gray-400">
                         بهترین پاسخ را انتخاب کنید
                     </div>
                     <div class="question question-name text-2xl my-5 mb-7">

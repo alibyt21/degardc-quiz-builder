@@ -64,6 +64,8 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     let answerBlock = newQuestion.querySelector(".answer-block");
     // sync question name with data
     newQuestion.querySelector(".question-name").innerHTML = singleQuestion.name;
+    // sync question description with data
+    newQuestion.querySelector(".question-description").innerHTML = singleQuestion.description;
     // insert id into question
     answerBlock.dataset.qid = singleQuestion.id;
     // insert quiz group id into question
@@ -124,6 +126,7 @@ function create_quiz(quizData) {
         }
         //show result
         mainParent.appendChild(clonedResult);
+        
 
         //book an appointment
         if (quizData.settings.bookAnAppointment) {
@@ -376,6 +379,9 @@ function limit_to_result_page() {
 }
 
 function create_result() {
+    if(!quizData.settings.showResult){
+        return;
+    }
     document.querySelector(".result").style.visibility = "visible";
     document.querySelector(".result").style.opacity = "1";
     // set quiz to finished
