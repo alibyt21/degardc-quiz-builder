@@ -48,7 +48,7 @@ function degardc_quiz_builder_callback($atts)
                     <div class="mx-auto w-full text-center">
                         <h1 class="quiz-name text-[18px] md:text-[20px] lg:text-[22px] font-semibold text-center"></h1>
                     </div>
-                    <div class="quiz-description max-w-[500px] border border-solid border-gray-200 p-2 md:p-4 lg:p-6 rounded-xl my-10 mx-auto text-justify"></div>
+                    <div class="quiz-description invisible max-w-[500px] border border-solid border-gray-200 p-2 md:p-4 lg:p-6 rounded-xl my-10 mx-auto text-justify"></div>
                 </div>
 
                 <div class="flex justify-center bg-white p-5 md:p-7 lg:p-10 pt-0 rounded-b-xl absolute bottom-5 w-full transition-all duration-[0.9s] ease-in-out">
@@ -199,6 +199,20 @@ function degardc_quiz_builder_callback($atts)
                         رزرو
                     </button>
                     <button class="hidden dg-prev-step-button mb-3 bg-blue-500 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
+
+                    </button>
+                </div>
+            </div>
+
+            <div style="opacity:0" class="thank flex justify-center dg-step-card bg-white absolute top-12 left-2 right-2 rounded-xl w-auto h-[90vh] shadow-lg transition-all ease-in-out items-center">
+                <div id="thank-message">
+
+                </div>
+                <div class="flex flex-col justify-center mx-auto bg-white p-5 md:p-7 lg:p-10 absolute bottom-0 rounded-b-xl w-full max-w-[580px]">
+                    <button class="hidden dg-next-step-button mb-3 bg-blue-500 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
+                        مشاهده نتیجه
+                    </button>
+                    <button class="hidden dg-prev-step-button mb-3 bg-blue-500 transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white">
 
                     </button>
                 </div>

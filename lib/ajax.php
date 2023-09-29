@@ -5,7 +5,7 @@ function degardc_quiz_builder_save_quiz_data_ajax()
     global $wpdb;
     $table = $wpdb->prefix . 'degardcquiz_quizes';
 
-    $post_body = file_get_contents('php://input');
+    $post_body = trim(file_get_contents('php://input'));
     $id = $_GET["id"];
     if (is_numeric($id)) {
         // update

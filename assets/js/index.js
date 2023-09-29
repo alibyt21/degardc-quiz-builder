@@ -14,7 +14,8 @@ let clonedMultipleChoiceAnswer,
     clonedRegisterValidate,
     clonedBookAnAppointment,
     clonedSingleResult,
-    clonedResult;
+    clonedResult,
+    clonedThank;
 let stepBlocks,
     startExamButton,
     progressBar,
@@ -65,7 +66,8 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     // sync question name with data
     newQuestion.querySelector(".question-name").innerHTML = singleQuestion.name;
     // sync question description with data
-    newQuestion.querySelector(".question-description").innerHTML = singleQuestion.description;
+    newQuestion.querySelector(".question-description").innerHTML =
+        singleQuestion.description;
     // insert id into question
     answerBlock.dataset.qid = singleQuestion.id;
     // insert quiz group id into question
@@ -92,8 +94,13 @@ function create_quiz(quizData) {
     if (!quizResult.isFinished || !quizData.settings.oneAttempt) {
         //name and description
         document.querySelector(".quiz-name").innerHTML = quizData.name;
-        document.querySelector(".quiz-description").innerHTML =
-            quizData.description;
+        if (quizData.description) {
+            document.querySelector(".quiz-description").innerHTML =
+                quizData.description;
+            document
+                .querySelector(".quiz-description")
+                .classList.remove("invisible");
+        }
 
         //questions
         append_all_questions_into_html(quizData, mainParent);
@@ -124,9 +131,24 @@ function create_quiz(quizData) {
                     .querySelector("h1").innerHTML = "تایید شماره";
             }
         }
+
+        //show thank
+        if (quizData.settings.showThank) {
+            // tip: it's neccessery to add element first into document and you can change it!
+            mainParent.appendChild(clonedThank);
+            // prepare thank page
+            append_html_with_runnable_scripts_to_div(quizData.thankMessage,"thank-message")
+            if (quizData.settings.showResult) {
+                clonedThank.querySelector(
+                    ".dg-next-step-button"
+                ).style.display = "block";
+            }
+        }
+
         //show result
-        mainParent.appendChild(clonedResult);
-        
+        if (quizData.settings.showResult) {
+            mainParent.appendChild(clonedResult);
+        }
 
         //book an appointment
         if (quizData.settings.bookAnAppointment) {
@@ -143,6 +165,9 @@ function create_quiz(quizData) {
 }
 function tag_button_before_result_page() {
     const resultPage = document.querySelector(".result");
+    if (!resultPage) {
+        return;
+    }
     let index = get_node_index(resultPage);
 
     resultPage.parentElement.children[index - 1]
@@ -379,7 +404,7 @@ function limit_to_result_page() {
 }
 
 function create_result() {
-    if(!quizData.settings.showResult){
+    if (!quizData.settings.showResult) {
         return;
     }
     document.querySelector(".result").style.visibility = "visible";
@@ -413,7 +438,7 @@ function create_result() {
 }
 function make_result_message(totalScore) {
     quizData.resultMessage.forEach(function (single) {
-        if (+single.min <= +totalScore  && +totalScore <= +single.max) {
+        if (+single.min <= +totalScore && +totalScore <= +single.max) {
             document.querySelector(".result-message").innerHTML =
                 single.message || "";
         }
@@ -612,8 +637,8 @@ function exam_is_ready_to_start() {
                     document.querySelector(".register-validate")
                 );
                 handle_request_to_save_extra_info(extraInfo);
-                    console.log(participantData);
-                    console.log(extraInfo);
+                console.log(participantData);
+                console.log(extraInfo);
 
                 if (quizData.settings.collectMobileNumber) {
                     var mobileNumber =
@@ -896,7 +921,7 @@ function exam_is_ready_to_start() {
             let response = await request_to_api({
                 action: "degardc_quiz_builder_save_extra_info",
                 insertedId,
-                extraInfo : JSON.stringify(extraInfo),
+                extraInfo: JSON.stringify(extraInfo),
             });
         } catch (error) {
             throw new Error();
@@ -1463,6 +1488,21 @@ function exam_is_ready_to_start() {
 }
 
 /* START helper functions */
+function append_html_with_runnable_scripts_to_div(htmlCode, targetDivId) {
+    var tempDiv = document.createElement("div");
+    tempDiv.innerHTML = htmlCode;
+
+    var scripts = tempDiv.getElementsByTagName("script");
+    var targetDiv = document.getElementById(targetDivId);
+
+    for (var i = 0; i < scripts.length; i++) {
+        var script = document.createElement("script");
+        script.textContent = scripts[i].textContent;
+        targetDiv.appendChild(script);
+    }
+    targetDiv.innerHTML += tempDiv.innerHTML;
+}
+
 async function getData(
     url = "",
     urlParameters = {},
@@ -1697,6 +1737,9 @@ function make_copy_of_html_parts() {
 
     clonedResult = document.querySelector(".result").cloneNode(true);
     document.querySelector(".result").remove();
+
+    clonedThank = document.querySelector(".thank").cloneNode(true);
+    document.querySelector(".thank").remove();
 }
 
 function get_prev_quiz_result_if_exists() {

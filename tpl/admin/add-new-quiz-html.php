@@ -112,6 +112,12 @@
             </div>
             <textarea class="quiz-description w-full p-2 border my-2 rounded" name="" placeholder="توضیحات مربوط به آزمون را در این قسمت وارد کنید" rows="3"></textarea>
         </div>
+        <div class="thank-message-box border bg-white border-solid border-gray-300 rounded flex flex-col p-4">
+            <div>
+                محتوا صفحه تشکر سفارشی
+            </div>
+            <textarea class="quiz-thank-message w-full p-2 border my-2 rounded" name="" placeholder="محتوا مربوط به صفحه تشکر سفارشی سازی شده را در این قسمت وارد کنید" rows="3"></textarea>
+        </div>
         <div class="flex flex-col bg-white border border-solid border-gray-300 rounded p-4">
             <div class="mb-4">
                 سوالات
@@ -157,7 +163,7 @@
 
         </div>
     </div>
-    <div class="flex-1 bg-white border border-solid border-gray-300 rounded px-4 py-6 mx-2 h-full space-y-6">
+    <div class="settings-panel flex-1 bg-white border border-solid border-gray-300 rounded px-4 py-6 mx-2 h-full space-y-6">
         <div class="flex justify-between items-center">
             <span>ثبت نام در سایت اجباری باشد</span>
             <input class="quiz-settings-registerOnSite" type="checkbox">
@@ -175,32 +181,38 @@
             <input class="quiz-settings-collectParticipantName" type="checkbox">
         </div>
         <div class="flex justify-between items-center">
-            <span>نتیجه آزمون نمایش داده شود</span>
-            <input class="quiz-settings-showResult" type="checkbox">
-        </div>
-        <div class="flex justify-between items-center">
             <span>هرکس فقط یکبار بتواند شرکت کند</span>
             <input class="quiz-settings-oneAttempt" type="checkbox">
         </div>
-        <div class="resultMessage-container">
-            <div class="single-resultMessage border rounded p-4 mt-4">
-                <div class="flex items-center">
-                    <input class="resultMessage-lower-bundle w-full p-2 ml-2" type="number" min="0" max="100" placeholder="از (از 0 تا 100 وارد کنید)" id="">
-                    <input class="resultMessage-upper-bundle w-full p-2 mr-2" type="number" min="0" max="100" placeholder="تا (از 0 تا 100 وارد کنید)" id="">
-                </div>
-                <textarea class="resultMessage-message w-full mt-4 mb-2 p-2" cols="30" rows="3" placeholder="پیام نمایشی برای بازه مورد نظر"></textarea>
-                <div class="delete-resultMessage flex justify-center items-end">
-                    <div class="flex justify-center bg-[#ff5562] text-white rounded p-2 cursor-pointer w-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                        </svg>
-                        <button>حذف</button>
+        <div class="flex justify-between items-center">
+            <span>صفحه تشکر سفارشی نمایش داده شود</span>
+            <input class="quiz-settings-showThank" type="checkbox">
+        </div>
+        <div class="flex justify-between items-center">
+            <span>نتیجه آزمون نمایش داده شود</span>
+            <input class="quiz-settings-showResult" type="checkbox">
+        </div>
+        <div class="resultMessage-box flex flex-col">
+            <div class="resultMessage-container">
+                <div class="single-resultMessage border rounded p-4 mt-4">
+                    <div class="flex items-center">
+                        <input class="resultMessage-lower-bundle w-full p-2 ml-2" type="number" min="0" max="100" placeholder="از (از 0 تا 100 وارد کنید)" id="">
+                        <input class="resultMessage-upper-bundle w-full p-2 mr-2" type="number" min="0" max="100" placeholder="تا (از 0 تا 100 وارد کنید)" id="">
+                    </div>
+                    <textarea class="resultMessage-message w-full mt-4 mb-2 p-2" cols="30" rows="3" placeholder="پیام نمایشی برای بازه مورد نظر"></textarea>
+                    <div class="delete-resultMessage flex justify-center items-end">
+                        <div class="flex justify-center bg-[#ff5562] text-white rounded p-2 cursor-pointer w-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                            <button>حذف</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="add-new-resultMessage border border-gray-400 border-dashed rounded p-3 flex justify-center items-center cursor-pointer">
-            <span>افزودن پیام نمایشی جدید</span>
+            <div class="add-new-resultMessage border border-gray-400 border-dashed rounded p-3 flex justify-center items-center cursor-pointer mt-4">
+                <span>افزودن پیام نمایشی جدید</span>
+            </div>
         </div>
         <div class="flex justify-center items-end">
             <button id="save-changes" class="flex justify-center items-center h-10 bg-green-600 text-white rounded-lg p-2 cursor-pointer w-full">

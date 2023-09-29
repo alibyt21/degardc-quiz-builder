@@ -26,6 +26,7 @@ let state = {
     group: "",
     name: "",
     description: "",
+    thankMessage: "",
     resultMessage: [],
     questions: [],
     childs: [],
@@ -36,7 +37,8 @@ let state = {
         validateMobileNumber: false,
         registerOnSite: false,
         seprateResult: false,
-        showResult: false,
+        showThank: false,
+        showResult: true,
         bookAnAppointment: false,
         oneAttempt: false,
     },
@@ -181,6 +183,26 @@ function sync_quiz_info_to_view(state) {
     let quizDescription = document.querySelector(".quiz-description");
     quizDescription.value = state.description;
 
+    // sync thankyou message
+    let thankyouMessage = document.querySelector(".quiz-thank-message");
+    thankyouMessage.value = state.thankMessage;
+
+    // show thankyou message box only if showThank checked
+    let thankyouMessageBox = document.querySelector(".thank-message-box");
+    if (state.settings.showThank) {
+        thankyouMessageBox.style.display = "flex";
+    } else {
+        thankyouMessageBox.style.display = "none";
+    }
+
+    // show custom result message box only if showResult checked
+    let resultMessageBox = document.querySelector(".resultMessage-box");
+    if (state.settings.showResult) {
+        resultMessageBox.style.display = "flex";
+    } else {
+        resultMessageBox.style.display = "none";
+    }
+
     // sync settings
     document.querySelector(".quiz-settings-registerOnSite").checked =
         state.settings.registerOnSite;
@@ -190,6 +212,8 @@ function sync_quiz_info_to_view(state) {
         state.settings.validateMobileNumber;
     document.querySelector(".quiz-settings-collectParticipantName").checked =
         state.settings.collectParticipantName;
+    document.querySelector(".quiz-settings-showThank").checked =
+        state.settings.showThank;
     document.querySelector(".quiz-settings-showResult").checked =
         state.settings.showResult;
     document.querySelector(".quiz-settings-oneAttempt").checked =
@@ -280,6 +304,10 @@ function change_quiz_state(state, newQuizState) {
         newQuizState.description || newQuizState.description == ""
             ? newQuizState.description
             : prevState.description;
+    state.thankMessage =
+        newQuizState.thankMessage || newQuizState.thankMessage == ""
+            ? newQuizState.thankMessage
+            : prevState.thankMessage;
     if (newQuizState.settings) {
         for (var key of Object.keys(newQuizState.settings)) {
             state.settings[key] = newQuizState.settings[key];
@@ -398,6 +426,10 @@ quizContainer.addEventListener("change", async function (e) {
         } else if (e.target.className.includes("quiz-description")) {
             change_quiz_state(state, {
                 description: e.target.value,
+            });
+        } else if (e.target.className.includes("quiz-thank-message")) {
+            change_quiz_state(state, {
+                thankMessage: e.target.value,
             });
         } else if (e.target.className.includes("quiz-settings")) {
             let key = e.target.className.replace("quiz-settings-", "");
@@ -591,10 +623,17 @@ let saveChanges = document.getElementById("save-changes");
 saveChanges.addEventListener("click", async function (e) {
     let buttonPrevText = start_loading_animation(e.target);
     await save_data_to_db(state);
-    console.log("injjja");
     end_loading_animation(e.target, buttonPrevText);
 });
 /* START save changes */
+
+let settingsPanel = document.querySelector(".settings-panel");
+settingsPanel.addEventListener("click", function () {
+    setTimeout(function () {
+        sync_state_to_view(state);
+    }, 0);
+});
+
 function end_loading_page_animation() {
     document.querySelector(".loading").style.display = "none";
     document.querySelector(".loaded").style.filter = "none";

@@ -652,6 +652,9 @@ path.blue {
     margin-right: 0.5rem;
 }
 
+.invisible{
+    visibility: hidden;
+}
 
 .flex {
     display: flex;
