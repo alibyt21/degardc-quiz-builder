@@ -82,7 +82,7 @@ function degardc_quiz_builder_callback($atts)
                     <button class="dg-prev-question-button dg-prev-step-button hover:bg-[#efefef] transition-all duration-300 ease-in-out border border-solid border-gray-300 cursor-pointer w-full rounded-xl p-3 ml-5 flex justify-center items-center h-[63px]">
                         قبلی
                     </button>
-                    <button class="dg-next-question-button dg-next-step-button transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
+                    <button disabled class="dg-next-question-button dg-next-step-button transition-all duration-300 ease-in-out cursor-pointer w-full rounded-xl p-3 text-white flex justify-center items-center h-[63px]">
                         بعدی
                     </button>
                 </div>

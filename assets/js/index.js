@@ -68,6 +68,8 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     // sync question description with data
     newQuestion.querySelector(".question-description").innerHTML =
         singleQuestion.description;
+    // sync quesion settings with data happen in sync_participant_data_to_view
+
     // insert id into question
     answerBlock.dataset.qid = singleQuestion.id;
     // insert quiz group id into question
@@ -137,7 +139,10 @@ function create_quiz(quizData) {
             // tip: it's neccessery to add element first into document and you can change it!
             mainParent.appendChild(clonedThank);
             // prepare thank page
-            append_html_with_runnable_scripts_to_div(quizData.thankMessage,"thank-message")
+            append_html_with_runnable_scripts_to_div(
+                quizData.thankMessage,
+                "thank-message"
+            );
             if (quizData.settings.showResult) {
                 clonedThank.querySelector(
                     ".dg-next-step-button"
@@ -1210,6 +1215,7 @@ function exam_is_ready_to_start() {
             "questionId",
             qid
         );
+
         if (indexInParticipantData != -1) {
             // update
             let indexInAnswers = check_if_data_exists_in_array(
@@ -1257,6 +1263,7 @@ function exam_is_ready_to_start() {
             };
             participantData.push(singleAnswerData);
         }
+
         sync_participant_data_to_view();
     }
 
@@ -1337,6 +1344,28 @@ function exam_is_ready_to_start() {
                 "questionId",
                 qid
             );
+            // START handle answer to question is required
+            let questionCard = find_related_parent_by_className(
+                singleAnswerBlock,
+                "dg-step-card"
+            );
+            let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, qgroup);
+            let question = get_question_in_sub_data_by_question_id(
+                singleQuizData,
+                qid
+            );
+            if((participantData[indexInParticipantData] && participantData[indexInParticipantData].answers.length) || !question.settings.isRequired){
+                questionCard
+                    .querySelector(".dg-next-step-button")
+                    .removeAttribute("disabled");
+            }else{
+                // answering to this question is neccessery
+                questionCard
+                .querySelector(".dg-next-step-button")
+                .setAttribute("disabled",true);
+            }
+            // END handle answer to question is required
+
             if (indexInParticipantData != -1) {
                 // means question exists in participate data
                 // START multiple choice questions

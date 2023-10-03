@@ -7,7 +7,9 @@ const DEFAULT_QUESTION_OBJECT = {
     name: "",
     description: "",
     answers: [],
-    settings: {},
+    settings: {
+        isRequired: false,
+    },
 };
 
 const DEFAULT_ANSWER_OBJECT = {
@@ -53,117 +55,6 @@ let clonedEmptyAnswer = document
 let clonedEmptyResultMessage = document
     .querySelector(".single-resultMessage")
     .cloneNode(true);
-
-/* START helper functions */
-function end_loading_animation(buttonNode, buttonPrevText) {
-    buttonNode.innerHTML = buttonPrevText;
-}
-function start_loading_animation(buttonNode) {
-    let buttonPrevText = buttonNode.innerHTML;
-    buttonNode.innerHTML = loaderHTML;
-    return buttonPrevText;
-}
-
-function show_notif(text, type = "alert") {
-    let color;
-    switch (type) {
-        case "alert":
-            color = "#333333";
-            break;
-        case "error":
-            color = "#fe597b";
-            break;
-        case "success":
-            color = "#1aae50";
-            break;
-    }
-    Toastify({
-        text,
-        duration: 5000,
-        close: false,
-        gravity: "bottom", // `top` or `bottom`
-        position: "left", // `left`, `center` or `right`
-        stopOnFocus: true, // Prevents dismissing of toast on hover,
-        escapeMarkup: false,
-        style: {
-            background: color,
-            borderRadius: "10px",
-            boxShadow: "0 3px 6px 0px rgba(0,0,0,.06)",
-            userSelect: "none",
-        },
-    }).showToast();
-}
-function find_related_parent_by_className(node, className) {
-    let isFindParent = false;
-    let parent = node;
-    // prevent infinite loop
-    let counter = 0;
-    while (!isFindParent && counter <= 20) {
-        if (
-            parent &&
-            parent.className &&
-            parent.className.toString().includes(className)
-        ) {
-            isFindParent = true;
-        } else {
-            parent = parent.parentNode ? parent.parentNode : parent;
-        }
-        counter = counter + 1;
-    }
-    if (isFindParent) {
-        return parent;
-    } else {
-        return false;
-    }
-}
-async function postData(
-    url = "",
-    urlParameters = {},
-    data = {},
-    headers = {
-        "Content-Type": "application/json",
-    }
-) {
-    try {
-        // Default options are marked with *
-        const response = await fetch(
-            url + "?" + new URLSearchParams(urlParameters),
-            {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
-                mode: "cors", // no-cors, *cors, same-origin
-                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-                credentials: "same-origin", // include, *same-origin, omit
-                headers,
-                redirect: "follow", // manual, *follow, error
-                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                body: JSON.stringify(data), // body data type must match "Content-Type" header
-            }
-        );
-        return response.json(); // parses JSON response into native JavaScript objects
-    } catch (error) {
-        show_notif(
-            "در ارسال اطلاعات خطایی رخ داده است، لطفا چند دقیقه دیگر مجددا امتحان کنید"
-        );
-    }
-}
-async function getData(
-    url = "",
-    urlParameters = {},
-    headers = {
-        "Content-Type": "application/json",
-    }
-) {
-    const response = await fetch(
-        url + "?" + new URLSearchParams(urlParameters),
-        {
-            method: "GET",
-            headers: new Headers(headers),
-            mode: "cors",
-        }
-    );
-    return response.json(); // parses JSON response into native JavaScript objects
-}
-/* END helper functions */
 
 /* START sync state to view */
 function sync_state_to_view(state) {
@@ -244,7 +135,8 @@ function sync_questions_to_view(state) {
         sync_answers_of_a_single_question(singleQuestion.answers, newQuestion);
 
         // sync settings
-        // TODO
+        newQuestion.querySelector(".question-settings-isRequired").checked =
+            singleQuestion.settings.isRequired;
 
         // attach manipulated question to quiz
         questionsContainer.appendChild(newQuestion);
@@ -336,24 +228,28 @@ function change_result_message_state_by_result_message_index(
                 : prevState.message,
     };
 }
+
 function change_question_state_by_question_index(
     state,
     questionIndex,
     newQuestionState
 ) {
     let prevState = state.questions[questionIndex];
-    state.questions[questionIndex] = {
-        id: prevState.id,
-        name:
-            newQuestionState.name || newQuestionState.name == ""
-                ? newQuestionState.name
-                : prevState.name,
-        description:
-            newQuestionState.description || newQuestionState.description == ""
-                ? newQuestionState.description
-                : prevState.description,
-        answers: prevState.answers,
-    };
+    state.questions[questionIndex].name =
+        newQuestionState.name || newQuestionState.name == ""
+            ? newQuestionState.name
+            : prevState.name;
+    state.questions[questionIndex].description =
+        newQuestionState.description || newQuestionState.description == ""
+            ? newQuestionState.description
+            : prevState.description;
+    state.questions[questionIndex].answers = prevState.answers;
+    if (newQuestionState.settings) {
+        for (var key of Object.keys(newQuestionState.settings)) {
+            state.questions[questionIndex].settings[key] =
+                newQuestionState.settings[key];
+        }
+    }
 }
 
 function change_answer_state_by_question_and_answer_index(
@@ -456,6 +352,13 @@ quizContainer.addEventListener("change", async function (e) {
         } else if (e.target.className.includes("question-description")) {
             change_question_state_by_question_index(state, questionIndex, {
                 description: e.target.value,
+            });
+        } else if (e.target.className.includes("question-settings")) {
+            let key = e.target.className.replace("question-settings-", "");
+            change_question_state_by_question_index(state, questionIndex, {
+                settings: {
+                    [key]: e.target.checked,
+                },
             });
         }
     } else if (e.target.className.includes("answer")) {
@@ -714,3 +617,113 @@ async function send_state_to_back_end(mode = "update") {
         console.log(state);
     }, 2000);
 })();
+
+/* START helper functions */
+function end_loading_animation(buttonNode, buttonPrevText) {
+    buttonNode.innerHTML = buttonPrevText;
+}
+function start_loading_animation(buttonNode) {
+    let buttonPrevText = buttonNode.innerHTML;
+    buttonNode.innerHTML = loaderHTML;
+    return buttonPrevText;
+}
+function show_notif(text, type = "alert") {
+    let color;
+    switch (type) {
+        case "alert":
+            color = "#333333";
+            break;
+        case "error":
+            color = "#fe597b";
+            break;
+        case "success":
+            color = "#1aae50";
+            break;
+    }
+    Toastify({
+        text,
+        duration: 5000,
+        close: false,
+        gravity: "bottom", // `top` or `bottom`
+        position: "left", // `left`, `center` or `right`
+        stopOnFocus: true, // Prevents dismissing of toast on hover,
+        escapeMarkup: false,
+        style: {
+            background: color,
+            borderRadius: "10px",
+            boxShadow: "0 3px 6px 0px rgba(0,0,0,.06)",
+            userSelect: "none",
+        },
+    }).showToast();
+}
+function find_related_parent_by_className(node, className) {
+    let isFindParent = false;
+    let parent = node;
+    // prevent infinite loop
+    let counter = 0;
+    while (!isFindParent && counter <= 20) {
+        if (
+            parent &&
+            parent.className &&
+            parent.className.toString().includes(className)
+        ) {
+            isFindParent = true;
+        } else {
+            parent = parent.parentNode ? parent.parentNode : parent;
+        }
+        counter = counter + 1;
+    }
+    if (isFindParent) {
+        return parent;
+    } else {
+        return false;
+    }
+}
+async function postData(
+    url = "",
+    urlParameters = {},
+    data = {},
+    headers = {
+        "Content-Type": "application/json",
+    }
+) {
+    try {
+        // Default options are marked with *
+        const response = await fetch(
+            url + "?" + new URLSearchParams(urlParameters),
+            {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                mode: "cors", // no-cors, *cors, same-origin
+                cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: "same-origin", // include, *same-origin, omit
+                headers,
+                redirect: "follow", // manual, *follow, error
+                referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data), // body data type must match "Content-Type" header
+            }
+        );
+        return response.json(); // parses JSON response into native JavaScript objects
+    } catch (error) {
+        show_notif(
+            "در ارسال اطلاعات خطایی رخ داده است، لطفا چند دقیقه دیگر مجددا امتحان کنید"
+        );
+    }
+}
+async function getData(
+    url = "",
+    urlParameters = {},
+    headers = {
+        "Content-Type": "application/json",
+    }
+) {
+    const response = await fetch(
+        url + "?" + new URLSearchParams(urlParameters),
+        {
+            method: "GET",
+            headers: new Headers(headers),
+            mode: "cors",
+        }
+    );
+    return response.json(); // parses JSON response into native JavaScript objects
+}
+/* END helper functions */

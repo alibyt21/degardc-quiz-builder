@@ -146,6 +146,10 @@
                         </div>
                     </div>
                     <div class="flex-1 p-4 h-full">
+                        <div class="flex justify-between items-center my-2 mb-4">
+                            <span>پاسخ دادن اجباری است</span>
+                            <input class="question-settings-isRequired" type="checkbox">
+                        </div>
                         <div class="delete-question flex justify-center items-end">
                             <div class="flex justify-center bg-[#ff5562] text-white rounded p-2 cursor-pointer w-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">

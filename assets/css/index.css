@@ -464,6 +464,10 @@ path.blue {
     border: none !important;
 }
 
+.dg-next-step-button:disabled{
+    background-color: #b6deff !important;
+}
+
 .dg-prev-step-button {
     border: 1px solid #cccccc !important;
     background-color: #ffffff !important;
