@@ -209,8 +209,13 @@ function degardc_quiz_builder_submit_answers_ajax()
         $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
     }
     $db_result = $wpdb->insert($table, $row);
-    $insert_id = $wpdb->insert_id;
-    if (!$db_result) {
+    $inserted_id = $wpdb->insert_id;
+
+    // update hash base on quiz_id and answer_id
+    $data = array('hash' => md5($quiz_id.$inserted_id));
+    $where = array('id' => $inserted_id);
+    $update_hash_result = $wpdb->update($table, $data, $where);
+    if (!$db_result && !$update_hash_result) {
         $result = array(
             'error' => true,
             'message' => "خطایی رخ داده است، کد خطا: 17",
@@ -219,7 +224,7 @@ function degardc_quiz_builder_submit_answers_ajax()
     }
     $result = array(
         'error' => false,
-        'message' => $insert_id,
+        'message' => $inserted_id,
     );
     wp_send_json($result);
 }
@@ -533,80 +538,4 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
 }
 add_action('wp_ajax_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
 add_action('wp_ajax_nopriv_degardc_quiz_builder_login_if_exists_register_if_new', 'degardc_quiz_builder_login_if_exists_register_if_new');
-
-// function degardc_quiz_builder_login_register_with_mobile()
-// {
-//     // check_ajax_referer('degardc_register_nonce', 'security');
-//     $email = sanitize_text_field($_POST['email']);
-//     $password = sanitize_text_field($_POST['password']);
-//     $user_validation_code = sanitize_text_field($_POST['validationCode']);
-//     $inserted_id = sanitize_text_field($_POST['insertedId']);
-//     $mobile_number = sanitize_text_field($_POST['mobileNumber']);
-//     $first_name = sanitize_text_field($_POST['firstName']);
-//     $last_name = sanitize_text_field($_POST['lastName']);
-
-//     if (empty($email) || empty($password) || empty($user_validation_code)) {
-//         $result = array(
-//             'error' => true,
-//             'message' => 'لطفا فرم را به صورت کامل تکمیل کنید'
-//         );
-//         wp_send_json($result);
-//     }
-//     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-//         $result = array(
-//             'error' => true,
-//             'message' => 'لطفا ایمیل خود را به صورت صحیح وارد کنید'
-//         );
-//         wp_send_json($result);
-//     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//     global $wpdb;
-//     $column = "mobile_number";
-//     $table = $wpdb->prefix . 'degardcquiz_answers';
-//     $last_user_try = json_decode($wpdb->get_row("SELECT $column FROM $table WHERE id = $inserted_id")->$column);
-//     $system_validation_code = $last_user_try->code;
-//     if ($system_validation_code != $user_validation_code) {
-//         $result = array(
-//             'error' => true,
-//             'message' =>  'کد وارد شده اشتباه است، لطفا مجددا تلاش کنید',
-//         );
-//         wp_send_json($result);
-//     }
-
-//     if ($mobile_number != $last_user_try->number) {
-//         $result = array(
-//             'error' => true,
-//             'message' =>  'شماره همراه وارد شده نامعتبر است، در صورت نیاز به پشتیبانی اطلاع دهید',
-//         );
-//         wp_send_json($result);
-//     }
-//     $data = array('mobile_number' => $mobile_number, 'is_verified' => true);
-//     $where = array('id' => $inserted_id);
-//     $db_result = $wpdb->update($table, $data, $where);
-//     if (!$db_result) {
-//         $result = array(
-//             'error' => true,
-//             'message' =>  "خطایی رخ داده است، کد خطا: 11",
-//         );
-//         wp_send_json($result);
-//     }
-//     $result = array(
-//         'error' => false,
-//         'message' =>  'شماره شما با موفقیت تایید شد',
-//     );
-//     wp_send_json($result);
-// }
 /* END FRONT APIs */

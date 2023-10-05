@@ -44,7 +44,8 @@ function degardc_quiz_builder_create_db_table()
     $sql2 = "CREATE TABLE IF NOT EXISTS $answer_table_name (
       id bigint(20) NOT NULL AUTO_INCREMENT,
       quiz_id int(11) NOT NULL,
-      mobile_number text(1024),
+      hash text(127) DEFAULT NULL,
+      mobile_number text(127),
       is_verified boolean NOT NULL,
       answer text(4095),
       result text(4095),
