@@ -54,8 +54,9 @@ async function load_quiz_data() {
     quizData = JSON.parse(response.message);
 }
 
-function create_multiple_choice_answer(singleAnswer) {
+function create_multiple_choice_answer(singleAnswer,index) {
     let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
+    newAnswer.dataset.aid = index;
     newAnswer.querySelector(".answer-name").innerHTML = singleAnswer.name;
     return newAnswer;
 }
@@ -74,8 +75,8 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     answerBlock.dataset.qid = singleQuestion.id;
     // insert quiz group id into question
     answerBlock.dataset.qgroup = quizGroup;
-    singleQuestion.answers.forEach(function (singleAnswer) {
-        answerBlock.appendChild(create_multiple_choice_answer(singleAnswer));
+    singleQuestion.answers.forEach(function (singleAnswer,index) {
+        answerBlock.appendChild(create_multiple_choice_answer(singleAnswer,index));
     });
     return newQuestion;
 }
@@ -642,8 +643,6 @@ function exam_is_ready_to_start() {
                     document.querySelector(".register-validate")
                 );
                 handle_request_to_save_extra_info(extraInfo);
-                console.log(participantData);
-                console.log(extraInfo);
 
                 if (quizData.settings.collectMobileNumber) {
                     var mobileNumber =
@@ -1195,6 +1194,7 @@ function exam_is_ready_to_start() {
             e.target,
             "answer-block"
         );
+    
         let qType = relatedAnswerBlock.dataset.qtype;
         let qid = relatedAnswerBlock.dataset.qid;
         let qgroup = relatedAnswerBlock.dataset.qgroup;
@@ -1206,7 +1206,7 @@ function exam_is_ready_to_start() {
         );
 
         let answerName = relatedAnswer.querySelector(".answer-name").innerHTML;
-
+        let answerId = relatedAnswer.dataset.aid;
         // multiple choice questions
         let indexInParticipantData = check_if_data_exists_in_array(
             participantData,
@@ -1226,12 +1226,13 @@ function exam_is_ready_to_start() {
             if (qType == QUESTION_TYPES.type1) {
                 // single option
                 if (indexInAnswers != -1) {
-                    // data was existed before and clean up answers
+                    // data exists before and clean up answers
                     participantData[indexInParticipantData].answers = [];
                 } else {
                     // add new data
                     participantData[indexInParticipantData].answers = [
                         {
+                            id: answerId,
                             name: answerName,
                         },
                     ];
@@ -1239,13 +1240,14 @@ function exam_is_ready_to_start() {
             } else if (qType == QUESTION_TYPES.type2) {
                 // multi option
                 if (indexInAnswers != -1) {
-                    // data was existed before and remove it
+                    // data exists before and remove it
                     participantData[indexInParticipantData].answers.splice(
                         indexInAnswers,
                         1
                     );
                 } else {
                     participantData[indexInParticipantData].answers.push({
+                        id: answerId,
                         name: answerName,
                     });
                 }
@@ -1257,6 +1259,7 @@ function exam_is_ready_to_start() {
                 questionId: qid,
                 answers: [
                     {
+                        id: answerId,
                         name: answerName,
                     },
                 ],
@@ -1333,6 +1336,7 @@ function exam_is_ready_to_start() {
     }
 
     function sync_participant_data_to_view() {
+        console.log(participantData);
         let answerBlocks = document.querySelectorAll(".answer-block");
         answerBlocks.forEach(function (singleAnswerBlock) {
             let qid = singleAnswerBlock.dataset.qid;
