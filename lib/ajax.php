@@ -212,7 +212,8 @@ function degardc_quiz_builder_submit_answers_ajax()
     $inserted_id = $wpdb->insert_id;
 
     // update hash base on quiz_id and answer_id
-    $data = array('hash' => md5($quiz_id.$inserted_id));
+    $hash = md5($quiz_id.$inserted_id);
+    $data = array('hash' => $hash);
     $where = array('id' => $inserted_id);
     $update_hash_result = $wpdb->update($table, $data, $where);
     if (!$db_result && !$update_hash_result) {
@@ -225,6 +226,7 @@ function degardc_quiz_builder_submit_answers_ajax()
     $result = array(
         'error' => false,
         'message' => $inserted_id,
+        'hash' => $hash
     );
     wp_send_json($result);
 }

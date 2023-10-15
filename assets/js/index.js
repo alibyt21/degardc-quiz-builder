@@ -170,11 +170,11 @@ function create_quiz(quizData) {
     init_before_exam_start();
 }
 function tag_button_before_result_page() {
-    const resultPage = document.querySelector(".result");
-    if (!resultPage) {
+    if (!quizData.settings.showResult) {
         return;
     }
     let index = get_node_index(resultPage);
+    const resultPage = document.querySelector(".result");
 
     resultPage.parentElement.children[index - 1]
         .querySelector(".dg-next-step-button")
@@ -900,6 +900,7 @@ function exam_is_ready_to_start() {
                 });
                 if (response && !response.error) {
                     insertedId = response.message;
+                    answerHash = response.hash;
                 } else {
                     throw new Error();
                 }
@@ -1522,18 +1523,25 @@ function exam_is_ready_to_start() {
 
 /* START helper functions */
 function append_html_with_runnable_scripts_to_div(htmlCode, targetDivId) {
+    // append thank message content to thank page
+    let thankDiv = document.querySelector(".thank");
     var tempDiv = document.createElement("div");
     tempDiv.innerHTML = htmlCode;
-
     var scripts = tempDiv.getElementsByTagName("script");
     var targetDiv = document.getElementById(targetDivId);
-
-    for (var i = 0; i < scripts.length; i++) {
-        var script = document.createElement("script");
-        script.textContent = scripts[i].textContent;
-        targetDiv.appendChild(script);
-    }
     targetDiv.innerHTML += tempDiv.innerHTML;
+
+    let interval = setInterval(() => {
+        if(thankDiv.style.opacity == 1 && answerHash){
+            // check only if thank page is shown run the thank scripts if exists
+            for (var i = 0; i < scripts.length; i++) {
+                var script = document.createElement("script");
+                script.textContent = scripts[i].textContent;
+                targetDiv.appendChild(script);
+            }
+            clearInterval(interval);
+        }
+    }, 500);
 }
 
 async function getData(

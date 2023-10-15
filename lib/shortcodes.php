@@ -20,6 +20,9 @@ function degardc_quiz_builder_callback($atts)
 
 
 ?>
+    <script>
+        var answerHash = false;
+    </script>
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/persian-datepicker.min.css' ?>" />
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/index.css' ?>" />
     <link rel="stylesheet" href="<?= DEGARDC_QUIZ_BUILDER_URL . 'assets/css/toastify.min.css' ?>" />
