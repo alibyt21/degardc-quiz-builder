@@ -203,7 +203,7 @@ function degardc_quiz_builder_submit_answers_ajax()
     $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
     if ($user_id && $user_mobile_number) {
         // happen when user loggined and validated mobile before
-        $row = array('quiz_id' => $quiz_id, 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
+        $row = array('quiz_id' => $quiz_id, 'user_id' => $user_id , 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
     } else {
         // happen for new users
         $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
@@ -442,6 +442,7 @@ add_action('wp_ajax_nopriv_degardc_quiz_builder_save_extra_info', 'degardc_quiz_
 function degardc_quiz_builder_login_if_exists_register_if_new()
 {
     // check_ajax_referer('degardc_register_nonce', 'security');
+    $inserted_id = sanitize_text_field($_POST['insertedId']);
     $email = sanitize_text_field($_POST['email']);
     $password = sanitize_text_field($_POST['password']);
     $first_name = sanitize_text_field($_POST['firstName']);
@@ -463,6 +464,16 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
     }
     if (email_exists($email)) {
         //it means that email is already registered in this site and we have to login
+
+        //save user_id
+        $user = get_user_by('email', $email);
+        $user_id = $user->ID;
+        global $wpdb;
+        $table = $wpdb->prefix . 'degardcquiz_answers';
+        $data = array('user_id' => $user_id);
+        $where = array('id' => $inserted_id);
+        $db_result = $wpdb->update($table, $data, $where);
+
 
         $creds = array(
             'user_login'    => $email,
@@ -515,6 +526,16 @@ function degardc_quiz_builder_login_if_exists_register_if_new()
             );
             wp_send_json($result);
         }
+
+
+        //save user_id
+        $user = get_user_by('email', $email);
+        $user_id = $user->ID;
+        global $wpdb;
+        $table = $wpdb->prefix . 'degardcquiz_answers';
+        $data = array('user_id' => $user_id);
+        $where = array('id' => $inserted_id);
+        $db_result = $wpdb->update($table, $data, $where);
 
         $creds = array(
             'user_login'    => $email,

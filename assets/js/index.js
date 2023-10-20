@@ -28,21 +28,26 @@ let currentIndex = 1;
 
 // before exam functions needs to run
 
-(async function init() {
-    await load_quiz_data();
-    check_current_user_info_and_change_quiz_data_if_needed();
-    check_quiz_data_and_make_it_compatible();
-    make_copy_of_html_parts();
-    get_prev_quiz_result_if_exists();
-    create_quiz(quizData);
-    // show result page instead of new exam as a result of oneAttempt is actived
-    if (quizResult.isFinished && quizData.settings.oneAttempt) {
-        limit_to_result_page();
-    }
-    // public events
-    window.addEventListener("resize", set_start_exam_button_position);
-    startExamButton.addEventListener("click", start_exam_button_animations);
-})();
+let isQuiz = document.querySelector(".quiz");
+if (isQuiz) {
+    (async function init() {
+        await load_quiz_data();
+        check_current_user_info_and_change_quiz_data_if_needed();
+        check_quiz_data_and_make_it_compatible();
+        make_copy_of_html_parts();
+        get_prev_quiz_result_if_exists();
+        create_quiz(quizData);
+        // show result page instead of new exam as a result of oneAttempt is actived
+        if (quizResult.isFinished && quizData.settings.oneAttempt) {
+            limit_to_result_page();
+        }
+        // public events
+        window.addEventListener("resize", set_start_exam_button_position);
+        startExamButton.addEventListener("click", start_exam_button_animations);
+    })();
+}else{
+    // we are in a page without Quiz!
+}
 
 async function load_quiz_data() {
     let infoDiv = document.querySelector(".info");
@@ -54,7 +59,7 @@ async function load_quiz_data() {
     quizData = JSON.parse(response.message);
 }
 
-function create_multiple_choice_answer(singleAnswer,index) {
+function create_multiple_choice_answer(singleAnswer, index) {
     let newAnswer = clonedMultipleChoiceAnswer.cloneNode(true);
     newAnswer.dataset.aid = index;
     newAnswer.querySelector(".answer-name").innerHTML = singleAnswer.name;
@@ -75,8 +80,10 @@ function create_multiple_choice_question(singleQuestion, quizGroup) {
     answerBlock.dataset.qid = singleQuestion.id;
     // insert quiz group id into question
     answerBlock.dataset.qgroup = quizGroup;
-    singleQuestion.answers.forEach(function (singleAnswer,index) {
-        answerBlock.appendChild(create_multiple_choice_answer(singleAnswer,index));
+    singleQuestion.answers.forEach(function (singleAnswer, index) {
+        answerBlock.appendChild(
+            create_multiple_choice_answer(singleAnswer, index)
+        );
     });
     return newQuestion;
 }
@@ -949,12 +956,14 @@ function exam_is_ready_to_start() {
                     password,
                     firstName,
                     lastName,
+                    insertedId,
                 });
             } else {
                 response = await request_to_api({
                     action: "degardc_quiz_builder_login_if_exists_register_if_new",
                     email,
                     password,
+                    insertedId,
                 });
             }
             if (response.error) {
@@ -1195,7 +1204,7 @@ function exam_is_ready_to_start() {
             e.target,
             "answer-block"
         );
-    
+
         let qType = relatedAnswerBlock.dataset.qtype;
         let qid = relatedAnswerBlock.dataset.qid;
         let qgroup = relatedAnswerBlock.dataset.qgroup;
@@ -1354,20 +1363,27 @@ function exam_is_ready_to_start() {
                 singleAnswerBlock,
                 "dg-step-card"
             );
-            let singleQuizData = get_quiz_sub_data_by_quiz_group(quizData, qgroup);
+            let singleQuizData = get_quiz_sub_data_by_quiz_group(
+                quizData,
+                qgroup
+            );
             let question = get_question_in_sub_data_by_question_id(
                 singleQuizData,
                 qid
             );
-            if((participantData[indexInParticipantData] && participantData[indexInParticipantData].answers.length) || !question.settings.isRequired){
+            if (
+                (participantData[indexInParticipantData] &&
+                    participantData[indexInParticipantData].answers.length) ||
+                !question.settings.isRequired
+            ) {
                 questionCard
                     .querySelector(".dg-next-step-button")
                     .removeAttribute("disabled");
-            }else{
+            } else {
                 // answering to this question is neccessery
                 questionCard
-                .querySelector(".dg-next-step-button")
-                .setAttribute("disabled",true);
+                    .querySelector(".dg-next-step-button")
+                    .setAttribute("disabled", true);
             }
             // END handle answer to question is required
 
@@ -1532,7 +1548,7 @@ function append_html_with_runnable_scripts_to_div(htmlCode, targetDivId) {
     targetDiv.innerHTML += tempDiv.innerHTML;
 
     let interval = setInterval(() => {
-        if(thankDiv.style.opacity == 1 && answerHash){
+        if (thankDiv.style.opacity == 1 && answerHash) {
             // check only if thank page is shown run the thank scripts if exists
             for (var i = 0; i < scripts.length; i++) {
                 var script = document.createElement("script");

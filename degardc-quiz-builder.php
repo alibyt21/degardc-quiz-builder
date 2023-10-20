@@ -11,7 +11,7 @@
 * Text Domain: fa
 * Domain Path: /languages/
 */
-defined( 'ABSPATH' ) || exit;
+defined('ABSPATH') || exit;
 
 
 define('DEGARDC_QUIZ_BUILDER_URL', plugin_dir_url(__FILE__));
@@ -25,6 +25,7 @@ include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/hooks.php';
 include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/functions.php';
 include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/shortcodes.php';
 include_once DEGARDC_QUIZ_BUILDER_PATH . '/lib/ajax.php';
+
 
 function degardc_quiz_builder_create_db_table()
 {
@@ -45,6 +46,7 @@ function degardc_quiz_builder_create_db_table()
       id bigint(20) NOT NULL AUTO_INCREMENT,
       quiz_id int(11) NOT NULL,
       hash text(127) DEFAULT NULL,
+      user_id bigint(20),
       mobile_number text(127),
       is_verified boolean NOT NULL,
       answer text(4095),
@@ -132,7 +134,7 @@ function degardc_quiz_builder_settings_page()
         $sms_api_password = sanitize_text_field($_POST['sms_api_password']);
         $sms_api_from = sanitize_text_field($_POST['sms_api_from']);
         $sms_api_url = sanitize_text_field($_POST['sms_api_url']);
-        
+
         $degardc_quiz_builder_options['sms_api_username'] = $sms_api_username;
         $degardc_quiz_builder_options['sms_api_password'] = $sms_api_password;
         $degardc_quiz_builder_options['sms_api_from'] = $sms_api_from;
