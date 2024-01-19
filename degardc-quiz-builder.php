@@ -34,7 +34,7 @@ function degardc_quiz_builder_create_db_table()
     $charset_collate = $wpdb->get_charset_collate();
     $sql1 = "CREATE TABLE IF NOT EXISTS $quiz_table_name (
       id int(11) NOT NULL AUTO_INCREMENT,
-      options text(4095) NOT NULL,
+      options text(8191) NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       PRIMARY KEY id (id)
     ) $charset_collate;";

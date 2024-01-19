@@ -203,7 +203,9 @@ function degardc_quiz_builder_submit_answers_ajax()
     $user_mobile_number = get_user_meta($user_id, 'degardc_mobile_number', true);
     if ($user_id && $user_mobile_number) {
         // happen when user loggined and validated mobile before
-        $row = array('quiz_id' => $quiz_id, 'user_id' => $user_id , 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
+        $row = array('quiz_id' => $quiz_id, 'user_id' => $user_id, 'mobile_number' => $user_mobile_number, 'is_verified' => true, 'answer' => $participant_data, 'result' => $quiz_result);
+    } else if ($user_id) {
+        $row = array('quiz_id' => $quiz_id, 'user_id' => $user_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
     } else {
         // happen for new users
         $row = array('quiz_id' => $quiz_id, 'is_verified' => false, 'answer' => $participant_data, 'result' => $quiz_result);
@@ -212,7 +214,7 @@ function degardc_quiz_builder_submit_answers_ajax()
     $inserted_id = $wpdb->insert_id;
 
     // update hash base on quiz_id and answer_id
-    $hash = md5($quiz_id.$inserted_id);
+    $hash = md5($quiz_id . $inserted_id);
     $data = array('hash' => $hash);
     $where = array('id' => $inserted_id);
     $update_hash_result = $wpdb->update($table, $data, $where);
@@ -412,7 +414,8 @@ add_action('wp_ajax_degardc_quiz_builder_login_with_one_time_password', 'degardc
 add_action('wp_ajax_nopriv_degardc_quiz_builder_login_with_one_time_password', 'degardc_quiz_builder_login_with_one_time_password');
 
 
-function degardc_quiz_builder_save_extra_info(){
+function degardc_quiz_builder_save_extra_info()
+{
     $inserted_id = sanitize_text_field($_POST['insertedId']);
     $extra_info = stripslashes(sanitize_text_field($_POST['extraInfo']));
 
