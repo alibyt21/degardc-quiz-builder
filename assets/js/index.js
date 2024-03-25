@@ -45,7 +45,7 @@ if (isQuiz) {
         window.addEventListener("resize", set_start_exam_button_position);
         startExamButton.addEventListener("click", start_exam_button_animations);
     })();
-}else{
+} else {
     // we are in a page without Quiz!
 }
 
@@ -747,7 +747,6 @@ function exam_is_ready_to_start() {
                                     mobileNumber
                                 );
                             } else {
-                                console.log("hakakooo");
                                 await handle_request_to_check_validation_code(
                                     validationCode,
                                     mobileNumber
@@ -1278,6 +1277,14 @@ function exam_is_ready_to_start() {
         }
 
         sync_participant_data_to_view();
+
+        // auto skim questions by clicking on answers
+        if (quizData.settings.autoSkim) {
+            let index = get_node_index(
+                find_related_parent_by_className(e.target, "dg-step-card")
+            );
+            go_to_next_step_animations(index);
+        }
     }
 
     function check_if_data_exists_in_array(
@@ -1346,7 +1353,6 @@ function exam_is_ready_to_start() {
     }
 
     function sync_participant_data_to_view() {
-        console.log(participantData);
         let answerBlocks = document.querySelectorAll(".answer-block");
         answerBlocks.forEach(function (singleAnswerBlock) {
             let qid = singleAnswerBlock.dataset.qid;

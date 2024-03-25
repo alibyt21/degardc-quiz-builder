@@ -41,6 +41,7 @@ let state = {
         seprateResult: false,
         showThank: false,
         showResult: true,
+        autoSkim: false,
         bookAnAppointment: false,
         oneAttempt: false,
     },
@@ -107,6 +108,8 @@ function sync_quiz_info_to_view(state) {
         state.settings.showThank;
     document.querySelector(".quiz-settings-showResult").checked =
         state.settings.showResult;
+    document.querySelector(".quiz-settings-autoSkim").checked =
+        state.settings.autoSkim;
     document.querySelector(".quiz-settings-oneAttempt").checked =
         state.settings.oneAttempt;
 }

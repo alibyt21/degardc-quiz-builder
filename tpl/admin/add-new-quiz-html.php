@@ -196,6 +196,10 @@
             <span>نتیجه آزمون نمایش داده شود</span>
             <input class="quiz-settings-showResult" type="checkbox">
         </div>
+        <div class="flex justify-between items-center">
+            <span>با انتخاب جواب به سوال بعدی برو</span>
+            <input class="quiz-settings-autoSkim" type="checkbox">
+        </div>
         <div class="resultMessage-box flex flex-col">
             <div class="resultMessage-container">
                 <div class="single-resultMessage border rounded p-4 mt-4">
