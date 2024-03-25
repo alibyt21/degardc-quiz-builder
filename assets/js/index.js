@@ -1236,7 +1236,10 @@ function exam_is_ready_to_start() {
                 // single option
                 if (indexInAnswers != -1) {
                     // data exists before and clean up answers
-                    participantData[indexInParticipantData].answers = [];
+                    if(!quizData.settings.autoSkim){
+                        // only unselect answer if autoskim was off
+                        participantData[indexInParticipantData].answers = [];
+                    }
                 } else {
                     // add new data
                     participantData[indexInParticipantData].answers = [
