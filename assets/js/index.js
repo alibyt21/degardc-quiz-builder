@@ -1236,7 +1236,7 @@ function exam_is_ready_to_start() {
                 // single option
                 if (indexInAnswers != -1) {
                     // data exists before and clean up answers
-                    if(!quizData.settings.autoSkim){
+                    if (!quizData.settings.autoSkim) {
                         // only unselect answer if autoskim was off
                         participantData[indexInParticipantData].answers = [];
                     }
@@ -1287,6 +1287,9 @@ function exam_is_ready_to_start() {
                 find_related_parent_by_className(e.target, "dg-step-card")
             );
             go_to_next_step_animations(index);
+            if (check_if_is_it_last_question_in_group(e.target)) {
+                handle_request_to_submit_answers();
+            }
         }
     }
 
